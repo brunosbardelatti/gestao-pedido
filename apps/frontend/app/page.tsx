@@ -68,6 +68,13 @@ export default async function HomePage(): Promise<React.JSX.Element> {
                 <History className="size-4" aria-hidden />
                 Ver movimentações
               </Link>
+              <Link
+                href="/inventory/adjustments/new"
+                className="workspace-action"
+              >
+                <Plus className="size-4" aria-hidden />
+                Registrar ajuste
+              </Link>
             </div>
           </div>
           <div className="workspace-row">

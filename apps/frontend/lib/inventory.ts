@@ -78,6 +78,10 @@ export interface InventoryProductReference {
   description: string;
 }
 
+export interface InventoryAdjustmentProduct extends InventoryProductReference {
+  balance: number;
+}
+
 interface InventoryResponse {
   data: InventoryBalance[];
   meta: InventoryMeta;
@@ -171,5 +175,35 @@ export async function getInventoryProducts(): Promise<
     id: product.id,
     code: product.code,
     description: product.description,
+  }));
+}
+
+export async function getInventoryAdjustmentProducts(): Promise<
+  InventoryAdjustmentProduct[] | null
+> {
+  const [products, firstPage] = await Promise.all([
+    getInventoryProducts(),
+    getCurrentStock({ page: 1, pageSize: 100 }),
+  ]);
+  if (!products || !firstPage) return null;
+
+  const remainingPages = await Promise.all(
+    Array.from(
+      { length: Math.max(0, firstPage.meta.totalPages - 1) },
+      (_, index) => getCurrentStock({ page: index + 2, pageSize: 100 }),
+    ),
+  );
+  if (remainingPages.some((page) => !page)) return null;
+
+  const balances = new Map(
+    [
+      ...firstPage.balances,
+      ...remainingPages.flatMap((page) => page?.balances ?? []),
+    ].map((item) => [item.productId, item.balance]),
+  );
+
+  return products.map((product) => ({
+    ...product,
+    balance: balances.get(product.id) ?? 0,
   }));
 }

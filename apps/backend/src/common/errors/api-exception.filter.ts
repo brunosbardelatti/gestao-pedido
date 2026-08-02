@@ -19,6 +19,10 @@ import { InvalidBrandNameError } from '../../modules/brands/domain/errors/invali
 import { CategoryAlreadyExistsError } from '../../modules/categories/domain/errors/category-already-exists.error';
 import { CategoryNotFoundError } from '../../modules/categories/domain/errors/category-not-found.error';
 import { InvalidCategoryNameError } from '../../modules/categories/domain/errors/invalid-category-name.error';
+import { InvalidInventoryAdjustmentError } from '../../modules/inventory/domain/errors/invalid-inventory-adjustment.error';
+import { InventoryIdempotencyKeyConflictError } from '../../modules/inventory/domain/errors/inventory-idempotency-key-conflict.error';
+import { InventoryIdempotencyRequestInProgressError } from '../../modules/inventory/domain/errors/inventory-idempotency-request-in-progress.error';
+import { NegativeStockConfirmationRequiredError } from '../../modules/inventory/domain/errors/negative-stock-confirmation-required.error';
 import { DuplicateOrderProductError } from '../../modules/orders/domain/errors/duplicate-order-product.error';
 import { DuplicateReceiptItemError } from '../../modules/orders/domain/errors/duplicate-receipt-item.error';
 import { IdempotencyKeyConflictError } from '../../modules/orders/domain/errors/idempotency-key-conflict.error';
@@ -221,7 +225,9 @@ export class ApiExceptionFilter implements ExceptionFilter {
 
     if (
       exception instanceof IdempotencyKeyConflictError ||
-      exception instanceof IdempotencyRequestInProgressError
+      exception instanceof IdempotencyRequestInProgressError ||
+      exception instanceof InventoryIdempotencyKeyConflictError ||
+      exception instanceof InventoryIdempotencyRequestInProgressError
     ) {
       return {
         status: HttpStatus.CONFLICT,
@@ -231,6 +237,8 @@ export class ApiExceptionFilter implements ExceptionFilter {
     }
 
     if (
+      exception instanceof InvalidInventoryAdjustmentError ||
+      exception instanceof NegativeStockConfirmationRequiredError ||
       exception instanceof DuplicateOrderProductError ||
       exception instanceof DuplicateReceiptItemError ||
       exception instanceof InvalidExpirationDateError ||
