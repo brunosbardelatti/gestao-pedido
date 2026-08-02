@@ -3,7 +3,7 @@
 - **Status:** Aceita
 - **Domínio:** auth
 - **Tipo:** Especificação Funcional SDD
-- **Versão:** 1.0
+- **Versão:** 1.1
 
 ## Objetivo
 
@@ -23,8 +23,12 @@ Permitir que um administrador redefina manualmente a senha de outro usuário.
 ## Regras de Negócio
 
 - Não haverá recuperação automática por e-mail no MVP.
+- Somente um administrador autenticado por sessão pode executar a operação.
+- O administrador deve redefinir a senha de outro usuário, não a própria.
+- A nova senha deve possuir entre 8 e 128 caracteres.
 - A nova senha deve ser armazenada somente como hash.
-- A operação deve ser auditada.
+- A alteração da senha e a auditoria devem ocorrer na mesma transação.
+- A operação deve registrar auditoria `USER_PASSWORD_RESET` com administrador, usuário alvo e Request ID.
 
 ## Fluxo Principal
 
@@ -38,7 +42,10 @@ Permitir que um administrador redefina manualmente a senha de outro usuário.
 ## Fluxos Alternativos e Erros
 
 - Dados inválidos retornam `400 Bad Request`.
-- Recurso inexistente retorna `404 Not Found`.
+- Sessão ausente ou inválida retorna `401 Unauthorized`.
+- Usuário sem perfil de administrador retorna `403 Forbidden`.
+- Usuário alvo inexistente retorna `404 Not Found`.
+- Tentativa de redefinir a própria senha retorna `422 Unprocessable Entity`.
 - Conflito de unicidade ou idempotência retorna `409 Conflict`.
 - Violação de regra de negócio retorna `422 Unprocessable Entity`.
 - Erros internos não expõem stack trace.
@@ -47,6 +54,8 @@ Permitir que um administrador redefina manualmente a senha de outro usuário.
 
 - Administrador consegue redefinir a senha.
 - Usuário comum não consegue redefinir senha de terceiros.
+- A senha anterior deixa de autenticar e a nova senha passa a autenticar.
+- Tentativas rejeitadas não alteram a senha nem registram auditoria de redefinição.
 
 ## Cenários de Teste
 

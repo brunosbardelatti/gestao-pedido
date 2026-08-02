@@ -10,6 +10,9 @@ import type { Response } from 'express';
 
 import { InvalidCredentialsError } from '../../modules/auth/domain/errors/invalid-credentials.error';
 import { AuthenticationRequiredError } from '../../modules/auth/domain/errors/authentication-required.error';
+import { CannotResetOwnPasswordError } from '../../modules/auth/domain/errors/cannot-reset-own-password.error';
+import { InsufficientRoleError } from '../../modules/auth/domain/errors/insufficient-role.error';
+import { UserNotFoundError } from '../../modules/auth/domain/errors/user-not-found.error';
 import type { RequestWithId } from '../http/request-with-id';
 
 interface HttpExceptionBody {
@@ -68,6 +71,30 @@ export class ApiExceptionFilter implements ExceptionFilter {
     if (exception instanceof AuthenticationRequiredError) {
       return {
         status: HttpStatus.UNAUTHORIZED,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof InsufficientRoleError) {
+      return {
+        status: HttpStatus.FORBIDDEN,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof UserNotFoundError) {
+      return {
+        status: HttpStatus.NOT_FOUND,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof CannotResetOwnPasswordError) {
+      return {
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
         code: exception.code,
         message: exception.message,
       };

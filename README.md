@@ -40,6 +40,7 @@ O frontend fica disponível em `http://localhost:3000` e a API em `http://localh
 - `POST /api/v1/auth/login`: cria a sessão HTTP-only.
 - `GET /api/v1/auth/me`: retorna o usuário da sessão atual.
 - `POST /api/v1/auth/logout`: revoga a sessão atual e remove o cookie.
+- `POST /api/v1/users/{id}/reset-password`: redefine a senha de outro usuário como administrador.
 
 ## Verificações
 

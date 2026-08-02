@@ -26,6 +26,7 @@ function makeSubject(overrides?: { foundUser?: typeof user | null }) {
       ),
   };
   const passwordHasher: PasswordHasher = {
+    hash: vi.fn(),
     verify: vi.fn().mockResolvedValue(true),
   };
   const sessionTokenService: SessionTokenService = {

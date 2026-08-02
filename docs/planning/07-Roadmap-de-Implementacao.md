@@ -36,6 +36,7 @@ Como usuário, quero acessar o sistema com login e senha.
 - Logout.
 - Sessão por cookie HTTP-only.
 - Auditoria de login.
+- Redefinição manual de senha por administrador.
 
 ---
 
