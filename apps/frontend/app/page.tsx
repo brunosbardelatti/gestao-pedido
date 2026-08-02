@@ -2,6 +2,7 @@ import {
   Boxes,
   ClipboardList,
   ClipboardPlus,
+  History,
   PackageSearch,
   Plus,
   ShoppingBag,
@@ -62,6 +63,10 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               <Link href="/inventory" className="workspace-action">
                 <PackageSearch className="size-4" aria-hidden />
                 Consultar saldos
+              </Link>
+              <Link href="/inventory/movements" className="workspace-action">
+                <History className="size-4" aria-hidden />
+                Ver movimentações
               </Link>
             </div>
           </div>

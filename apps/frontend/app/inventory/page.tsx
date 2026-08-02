@@ -1,4 +1,4 @@
-import { AlertCircle, ArrowLeft, Search, X } from 'lucide-react';
+import { AlertCircle, ArrowLeft, History, Search, X } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -72,9 +72,18 @@ export default async function InventoryPage({
           Voltar para operação
         </Link>
 
-        <div className="mt-8">
-          <p className="section-kicker">Estoque</p>
-          <h1 className="mt-2 text-2xl font-semibold">Saldos atuais</h1>
+        <div className="mt-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="section-kicker">Estoque</p>
+            <h1 className="mt-2 text-2xl font-semibold">Saldos atuais</h1>
+          </div>
+          <Link
+            href="/inventory/movements"
+            className={buttonVariants({ variant: 'ghost' })}
+          >
+            <History className="size-4" aria-hidden />
+            Ver movimentações
+          </Link>
         </div>
 
         <form
