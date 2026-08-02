@@ -4,6 +4,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { UpdateProductForm } from '@/components/products/update-product-form';
 
+const refresh = vi.fn();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh }),
+}));
+
 const productId = '6a9028c4-b4dc-4132-b897-cd9e8049a33f';
 const brandId = '26bf7359-befe-4eb9-bcc9-58fc72489be0';
 const categoryId = 'bfab0010-f11e-4e5f-ad4b-a531c32b6472';
@@ -25,6 +31,7 @@ const props = {
 
 describe('UpdateProductForm', () => {
   beforeEach(() => {
+    refresh.mockReset();
     vi.stubGlobal('fetch', vi.fn());
   });
 
@@ -95,6 +102,7 @@ describe('UpdateProductForm', () => {
     expect(await screen.findByRole('status')).toHaveTextContent(
       'Produto PERF-002 atualizado.',
     );
+    expect(refresh).toHaveBeenCalledOnce();
   });
 
   it('shows a uniqueness conflict without clearing the form', async () => {

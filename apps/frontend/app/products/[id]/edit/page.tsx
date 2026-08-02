@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
 import { AppHeader } from '@/components/layout/app-header';
+import { DeactivateProductButton } from '@/components/products/deactivate-product-button';
 import { UpdateProductForm } from '@/components/products/update-product-form';
 import { getCurrentUser } from '@/lib/auth';
 import {
@@ -84,6 +85,11 @@ export default async function EditProductPage({
                 ? undefined
                 : 'Não foi possível carregar outras marcas e categorias.'
             }
+          />
+          <DeactivateProductButton
+            productId={product.id}
+            productCode={product.code}
+            initialActive={product.active}
           />
         </div>
       </section>

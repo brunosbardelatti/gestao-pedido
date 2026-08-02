@@ -64,6 +64,18 @@ test('creates, updates and rejects a duplicate product', async ({ page }) => {
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+  await page.getByRole('button', { name: 'Inativar produto' }).click();
+  await expect(
+    page.getByRole('group', {
+      name: `Confirmar inativação de ${updatedProductCode}`,
+    }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Confirmar inativação' }).click();
+  await expect(
+    page.getByRole('status').filter({
+      hasText: `Produto ${updatedProductCode} inativado.`,
+    }),
+  ).toContainText(`Produto ${updatedProductCode} inativado.`);
   await page.goto('/products/new');
   await page.getByLabel('Marca').selectOption({ label: brandName });
   await page.getByLabel('Categoria').selectOption({ label: categoryName });

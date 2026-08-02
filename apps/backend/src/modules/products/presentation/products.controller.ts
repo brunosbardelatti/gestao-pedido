@@ -5,6 +5,7 @@ import {
   Inject,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Put,
   Req,
@@ -19,10 +20,15 @@ import {
 } from '../application/use-cases/create-product.use-case';
 import { GetProductUseCase } from '../application/use-cases/get-product.use-case';
 import {
+  type SetProductActiveOutput,
+  SetProductActiveUseCase,
+} from '../application/use-cases/set-product-active.use-case';
+import {
   type UpdateProductOutput,
   UpdateProductUseCase,
 } from '../application/use-cases/update-product.use-case';
 import { CreateProductDto } from './dto/create-product.dto';
+import { SetProductActiveDto } from './dto/set-product-active.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
@@ -34,6 +40,8 @@ export class ProductsController {
     private readonly createProductUseCase: CreateProductUseCase,
     @Inject(GetProductUseCase)
     private readonly getProductUseCase: GetProductUseCase,
+    @Inject(SetProductActiveUseCase)
+    private readonly setProductActiveUseCase: SetProductActiveUseCase,
     @Inject(UpdateProductUseCase)
     private readonly updateProductUseCase: UpdateProductUseCase,
   ) {}
@@ -111,6 +119,34 @@ export class ProductsController {
       purchasePrice: input.purchasePrice,
       originalPrice: input.originalPrice,
       suggestedSalePrice: input.suggestedSalePrice,
+      requestId: request.requestId,
+    });
+
+    return { data: product };
+  }
+
+  @Patch(':id/active')
+  async setActive(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) productId: string,
+    @Body(
+      new ValidationPipe({
+        expectedType: SetProductActiveDto,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    )
+    input: SetProductActiveDto,
+    @Req() request: RequestWithId,
+  ): Promise<{ data: SetProductActiveOutput }> {
+    const cookies = request.cookies as Record<string, string | undefined>;
+    const actor = await this.getCurrentUserUseCase.execute({
+      token: cookies.session,
+    });
+    const product = await this.setProductActiveUseCase.execute({
+      actorId: actor.id,
+      productId,
+      active: input.active,
       requestId: request.requestId,
     });
 

@@ -1,3 +1,7 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+
 import type { CatalogOption } from '@/lib/catalog';
 
 import {
@@ -17,5 +21,14 @@ export function UpdateProductForm({
   productId,
   ...props
 }: UpdateProductFormProps): React.JSX.Element {
-  return <ProductForm intent="update" productId={productId} {...props} />;
+  const router = useRouter();
+
+  return (
+    <ProductForm
+      intent="update"
+      productId={productId}
+      onUpdated={() => router.refresh()}
+      {...props}
+    />
+  );
 }

@@ -74,6 +74,7 @@ interface ProductFormProps {
   categories: CatalogOption[];
   initialValues?: ProductFormInitialValues;
   referenceError?: string;
+  onUpdated?: () => void;
 }
 
 interface ApiErrorEnvelope {
@@ -115,6 +116,7 @@ export function ProductForm({
   categories,
   initialValues,
   referenceError,
+  onUpdated,
 }: ProductFormProps): React.JSX.Element {
   const isUpdate = intent === 'update';
   const [requestError, setRequestError] = useState<string | null>(null);
@@ -199,6 +201,7 @@ export function ProductForm({
         setFocus('code');
       }
       setSuccess({ id: body.data.id, code: body.data.code });
+      if (isUpdate) onUpdated?.();
     } catch {
       setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
     }

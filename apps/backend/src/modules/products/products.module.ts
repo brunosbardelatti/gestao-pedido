@@ -6,14 +6,18 @@ import type { GetProductPersistence } from './application/ports/get-product-pers
 import {
   CREATE_PRODUCT_PERSISTENCE,
   GET_PRODUCT_PERSISTENCE,
+  SET_PRODUCT_ACTIVE_PERSISTENCE,
   UPDATE_PRODUCT_PERSISTENCE,
 } from './application/ports/products.tokens';
+import type { SetProductActivePersistence } from './application/ports/set-product-active-persistence';
 import type { UpdateProductPersistence } from './application/ports/update-product-persistence';
 import { CreateProductUseCase } from './application/use-cases/create-product.use-case';
 import { GetProductUseCase } from './application/use-cases/get-product.use-case';
+import { SetProductActiveUseCase } from './application/use-cases/set-product-active.use-case';
 import { UpdateProductUseCase } from './application/use-cases/update-product.use-case';
 import { PrismaCreateProductPersistence } from './infrastructure/persistence/prisma-create-product.persistence';
 import { PrismaGetProductPersistence } from './infrastructure/persistence/prisma-get-product.persistence';
+import { PrismaSetProductActivePersistence } from './infrastructure/persistence/prisma-set-product-active.persistence';
 import { PrismaUpdateProductPersistence } from './infrastructure/persistence/prisma-update-product.persistence';
 import { ProductsController } from './presentation/products.controller';
 
@@ -23,6 +27,7 @@ import { ProductsController } from './presentation/products.controller';
   providers: [
     PrismaCreateProductPersistence,
     PrismaGetProductPersistence,
+    PrismaSetProductActivePersistence,
     PrismaUpdateProductPersistence,
     {
       provide: CREATE_PRODUCT_PERSISTENCE,
@@ -31,6 +36,10 @@ import { ProductsController } from './presentation/products.controller';
     {
       provide: GET_PRODUCT_PERSISTENCE,
       useExisting: PrismaGetProductPersistence,
+    },
+    {
+      provide: SET_PRODUCT_ACTIVE_PERSISTENCE,
+      useExisting: PrismaSetProductActivePersistence,
     },
     {
       provide: UPDATE_PRODUCT_PERSISTENCE,
@@ -47,6 +56,12 @@ import { ProductsController } from './presentation/products.controller';
       inject: [GET_PRODUCT_PERSISTENCE],
       useFactory: (persistence: GetProductPersistence) =>
         new GetProductUseCase(persistence),
+    },
+    {
+      provide: SetProductActiveUseCase,
+      inject: [SET_PRODUCT_ACTIVE_PERSISTENCE],
+      useFactory: (persistence: SetProductActivePersistence) =>
+        new SetProductActiveUseCase(persistence),
     },
     {
       provide: UpdateProductUseCase,
