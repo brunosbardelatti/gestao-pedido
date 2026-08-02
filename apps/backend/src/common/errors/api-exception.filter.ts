@@ -14,6 +14,7 @@ import { CannotResetOwnPasswordError } from '../../modules/auth/domain/errors/ca
 import { InsufficientRoleError } from '../../modules/auth/domain/errors/insufficient-role.error';
 import { UserNotFoundError } from '../../modules/auth/domain/errors/user-not-found.error';
 import { BrandAlreadyExistsError } from '../../modules/brands/domain/errors/brand-already-exists.error';
+import { BrandNotFoundError } from '../../modules/brands/domain/errors/brand-not-found.error';
 import { InvalidBrandNameError } from '../../modules/brands/domain/errors/invalid-brand-name.error';
 import type { RequestWithId } from '../http/request-with-id';
 
@@ -105,6 +106,14 @@ export class ApiExceptionFilter implements ExceptionFilter {
     if (exception instanceof BrandAlreadyExistsError) {
       return {
         status: HttpStatus.CONFLICT,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof BrandNotFoundError) {
+      return {
+        status: HttpStatus.NOT_FOUND,
         code: exception.code,
         message: exception.message,
       };

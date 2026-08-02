@@ -64,6 +64,10 @@ describe('CreateBrandForm', () => {
     expect(await screen.findByRole('status')).toHaveTextContent(
       'Marca Natura cadastrada.',
     );
+    expect(screen.getByRole('link', { name: 'Editar Natura' })).toHaveAttribute(
+      'href',
+      '/brands/brand-id/edit?name=Natura',
+    );
     expect(screen.getByLabelText('Nome da marca')).toHaveValue('');
   });
 

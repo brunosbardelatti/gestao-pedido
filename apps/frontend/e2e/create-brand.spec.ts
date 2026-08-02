@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('creates a brand and prevents a case-insensitive duplicate', async ({
+test('creates, updates and prevents a case-insensitive duplicate brand', async ({
   page,
 }) => {
   const brandName = `Marca E2E ${Date.now()}`;
@@ -24,7 +24,19 @@ test('creates a brand and prevents a case-insensitive duplicate', async ({
     `Marca ${brandName} cadastrada.`,
   );
 
-  await page.getByLabel('Nome da marca').fill(brandName.toUpperCase());
+  await page.getByRole('link', { name: `Editar ${brandName}` }).click();
+  await expect(page.getByRole('heading', { name: 'Editar marca' })).toBeVisible();
+  await expect(page.getByLabel('Nome da marca')).toHaveValue(brandName);
+
+  const updatedName = `${brandName} Atualizada`;
+  await page.getByLabel('Nome da marca').fill(updatedName);
+  await page.getByRole('button', { name: 'Salvar alterações' }).click();
+  await expect(page.getByRole('status')).toContainText(
+    `Marca ${updatedName} atualizada.`,
+  );
+
+  await page.goto('/brands/new');
+  await page.getByLabel('Nome da marca').fill(updatedName.toUpperCase());
   await page.getByRole('button', { name: 'Cadastrar marca' }).click();
   await expect(
     page.getByRole('alert').filter({

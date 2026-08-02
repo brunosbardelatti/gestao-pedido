@@ -2,7 +2,10 @@ import {
   Body,
   Controller,
   Inject,
+  Param,
+  ParseUUIDPipe,
   Post,
+  Put,
   Req,
   ValidationPipe,
 } from '@nestjs/common';
@@ -10,7 +13,9 @@ import {
 import type { RequestWithId } from '../../../common/http/request-with-id';
 import { GetCurrentUserUseCase } from '../../auth/application/use-cases/get-current-user.use-case';
 import { CreateBrandUseCase } from '../application/use-cases/create-brand.use-case';
+import { UpdateBrandUseCase } from '../application/use-cases/update-brand.use-case';
 import { CreateBrandDto } from './dto/create-brand.dto';
+import { UpdateBrandDto } from './dto/update-brand.dto';
 
 @Controller('brands')
 export class BrandsController {
@@ -19,6 +24,8 @@ export class BrandsController {
     private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
     @Inject(CreateBrandUseCase)
     private readonly createBrandUseCase: CreateBrandUseCase,
+    @Inject(UpdateBrandUseCase)
+    private readonly updateBrandUseCase: UpdateBrandUseCase,
   ) {}
 
   @Post()
@@ -48,6 +55,42 @@ export class BrandsController {
     });
     const brand = await this.createBrandUseCase.execute({
       actorId: actor.id,
+      name: input.name,
+      requestId: request.requestId,
+    });
+
+    return { data: brand };
+  }
+
+  @Put(':id')
+  async update(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) brandId: string,
+    @Body(
+      new ValidationPipe({
+        expectedType: UpdateBrandDto,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    )
+    input: UpdateBrandDto,
+    @Req() request: RequestWithId,
+  ): Promise<{
+    data: {
+      id: string;
+      name: string;
+      active: boolean;
+      createdAt: Date;
+      updatedAt: Date;
+    };
+  }> {
+    const cookies = request.cookies as Record<string, string | undefined>;
+    const actor = await this.getCurrentUserUseCase.execute({
+      token: cookies.session,
+    });
+    const brand = await this.updateBrandUseCase.execute({
+      actorId: actor.id,
+      brandId,
       name: input.name,
       requestId: request.requestId,
     });

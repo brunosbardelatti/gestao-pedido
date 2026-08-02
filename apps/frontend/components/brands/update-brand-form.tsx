@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, CircleCheck, LoaderCircle, Pencil, Plus } from 'lucide-react';
-import Link from 'next/link';
+import { AlertCircle, CircleCheck, LoaderCircle, Save } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-const createBrandSchema = z.object({
+const updateBrandSchema = z.object({
   name: z
     .string()
     .trim()
@@ -19,7 +19,12 @@ const createBrandSchema = z.object({
     .max(100, 'O nome deve ter no máximo 100 caracteres.'),
 });
 
-type CreateBrandFields = z.infer<typeof createBrandSchema>;
+type UpdateBrandFields = z.infer<typeof updateBrandSchema>;
+
+interface UpdateBrandFormProps {
+  brandId: string;
+  initialName: string;
+}
 
 interface ApiErrorEnvelope {
   error?: {
@@ -27,41 +32,38 @@ interface ApiErrorEnvelope {
   };
 }
 
-interface CreateBrandResponse {
+interface UpdateBrandResponse {
   data: {
-    id: string;
     name: string;
   };
 }
 
-interface CreatedBrand {
-  id: string;
-  name: string;
-}
-
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
-export function CreateBrandForm(): React.JSX.Element {
+export function UpdateBrandForm({
+  brandId,
+  initialName,
+}: UpdateBrandFormProps): React.JSX.Element {
+  const router = useRouter();
   const [requestError, setRequestError] = useState<string | null>(null);
-  const [createdBrand, setCreatedBrand] = useState<CreatedBrand | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
     reset,
-    setFocus,
     formState: { errors, isSubmitting },
-  } = useForm<CreateBrandFields>({
-    resolver: zodResolver(createBrandSchema),
-    defaultValues: { name: '' },
+  } = useForm<UpdateBrandFields>({
+    resolver: zodResolver(updateBrandSchema),
+    defaultValues: { name: initialName },
   });
 
-  async function submit(fields: CreateBrandFields): Promise<void> {
+  async function submit(fields: UpdateBrandFields): Promise<void> {
     setRequestError(null);
-    setCreatedBrand(null);
+    setSuccessMessage(null);
 
     try {
-      const response = await fetch(`${apiUrl}/api/v1/brands`, {
-        method: 'POST',
+      const response = await fetch(`${apiUrl}/api/v1/brands/${brandId}`, {
+        method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fields),
@@ -70,15 +72,18 @@ export function CreateBrandForm(): React.JSX.Element {
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as ApiErrorEnvelope;
         setRequestError(
-          body.error?.message ?? 'Não foi possível cadastrar a marca.',
+          body.error?.message ?? 'Não foi possível atualizar a marca.',
         );
         return;
       }
 
-      const body = (await response.json()) as CreateBrandResponse;
-      reset();
-      setCreatedBrand({ id: body.data.id, name: body.data.name });
-      setFocus('name');
+      const body = (await response.json()) as UpdateBrandResponse;
+      reset({ name: body.data.name });
+      setSuccessMessage(`Marca ${body.data.name} atualizada.`);
+      router.replace(
+        `/brands/${brandId}/edit?name=${encodeURIComponent(body.data.name)}`,
+        { scroll: false },
+      );
     } catch {
       setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
     }
@@ -118,23 +123,13 @@ export function CreateBrandForm(): React.JSX.Element {
         </div>
       ) : null}
 
-      {createdBrand ? (
+      {successMessage ? (
         <div
           role="status"
           className="mt-5 flex items-start gap-2 border-l-2 border-ring bg-muted px-3 py-2.5 text-sm text-foreground"
         >
           <CircleCheck className="mt-0.5 size-4 shrink-0 text-ring" aria-hidden />
-          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2">
-            <span>Marca {createdBrand.name} cadastrada.</span>
-            <Link
-              href={`/brands/${createdBrand.id}/edit?name=${encodeURIComponent(createdBrand.name)}`}
-              aria-label={`Editar ${createdBrand.name}`}
-              className="inline-flex min-h-8 items-center gap-1.5 font-semibold text-ring hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <Pencil className="size-3.5" aria-hidden />
-              Editar
-            </Link>
-          </div>
+          <span>{successMessage}</span>
         </div>
       ) : null}
 
@@ -142,12 +137,12 @@ export function CreateBrandForm(): React.JSX.Element {
         {isSubmitting ? (
           <>
             <LoaderCircle className="size-4 animate-spin" aria-hidden />
-            Cadastrando marca
+            Salvando alterações
           </>
         ) : (
           <>
-            <Plus className="size-4" aria-hidden />
-            Cadastrar marca
+            <Save className="size-4" aria-hidden />
+            Salvar alterações
           </>
         )}
       </Button>
