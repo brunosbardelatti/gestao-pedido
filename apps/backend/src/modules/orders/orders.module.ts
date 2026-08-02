@@ -2,9 +2,19 @@ import { Module } from '@nestjs/common';
 
 import { AuthModule } from '../auth/auth.module';
 import type { CreateOrderPersistence } from './application/ports/create-order-persistence';
-import { CREATE_ORDER_PERSISTENCE } from './application/ports/orders.tokens';
+import type { GetOrderPersistence } from './application/ports/get-order-persistence';
+import {
+  CREATE_ORDER_PERSISTENCE,
+  GET_ORDER_PERSISTENCE,
+  UPDATE_ORDER_PERSISTENCE,
+} from './application/ports/orders.tokens';
+import type { UpdateOrderPersistence } from './application/ports/update-order-persistence';
 import { CreateOrderUseCase } from './application/use-cases/create-order.use-case';
+import { GetOrderUseCase } from './application/use-cases/get-order.use-case';
+import { UpdateOrderUseCase } from './application/use-cases/update-order.use-case';
 import { PrismaCreateOrderPersistence } from './infrastructure/persistence/prisma-create-order.persistence';
+import { PrismaGetOrderPersistence } from './infrastructure/persistence/prisma-get-order.persistence';
+import { PrismaUpdateOrderPersistence } from './infrastructure/persistence/prisma-update-order.persistence';
 import { OrdersController } from './presentation/orders.controller';
 
 @Module({
@@ -12,15 +22,37 @@ import { OrdersController } from './presentation/orders.controller';
   controllers: [OrdersController],
   providers: [
     PrismaCreateOrderPersistence,
+    PrismaGetOrderPersistence,
+    PrismaUpdateOrderPersistence,
     {
       provide: CREATE_ORDER_PERSISTENCE,
       useExisting: PrismaCreateOrderPersistence,
+    },
+    {
+      provide: GET_ORDER_PERSISTENCE,
+      useExisting: PrismaGetOrderPersistence,
+    },
+    {
+      provide: UPDATE_ORDER_PERSISTENCE,
+      useExisting: PrismaUpdateOrderPersistence,
     },
     {
       provide: CreateOrderUseCase,
       inject: [CREATE_ORDER_PERSISTENCE],
       useFactory: (persistence: CreateOrderPersistence) =>
         new CreateOrderUseCase(persistence),
+    },
+    {
+      provide: GetOrderUseCase,
+      inject: [GET_ORDER_PERSISTENCE],
+      useFactory: (persistence: GetOrderPersistence) =>
+        new GetOrderUseCase(persistence),
+    },
+    {
+      provide: UpdateOrderUseCase,
+      inject: [UPDATE_ORDER_PERSISTENCE],
+      useFactory: (persistence: UpdateOrderPersistence) =>
+        new UpdateOrderUseCase(persistence),
     },
   ],
 })

@@ -12,13 +12,7 @@ import type {
   CreateOrderPersistenceResult,
   PersistedOrder,
 } from '../../application/ports/create-order-persistence';
-
-type OrderWithRelations = Prisma.OrderGetPayload<{
-  include: {
-    brand: true;
-    items: { include: { product: true } };
-  };
-}>;
+import { orderRelations, serializeOrder } from './order-persistence.mapper';
 
 @Injectable()
 export class PrismaCreateOrderPersistence implements CreateOrderPersistence {
@@ -99,11 +93,10 @@ export class PrismaCreateOrderPersistence implements CreateOrderPersistence {
             },
           },
           include: {
-            brand: true,
-            items: { include: { product: true } },
+            ...orderRelations,
           },
         });
-        const order = this.serialize(created);
+        const order = serializeOrder(created);
 
         await transaction.auditLog.create({
           data: {
@@ -170,40 +163,5 @@ export class PrismaCreateOrderPersistence implements CreateOrderPersistence {
     }
 
     return { status: 'idempotency_in_progress' };
-  }
-
-  private serialize(order: OrderWithRelations): PersistedOrder {
-    return {
-      id: order.id,
-      brand: {
-        id: order.brand.id,
-        name: order.brand.name,
-        active: order.brand.active,
-        createdAt: order.brand.createdAt.toISOString(),
-        updatedAt: order.brand.updatedAt.toISOString(),
-      },
-      cycle: order.cycle,
-      orderDate: order.orderDate.toISOString().slice(0, 10),
-      receivedAt: order.receivedAt?.toISOString() ?? null,
-      canceledAt: order.canceledAt?.toISOString() ?? null,
-      cancelReason: order.cancelReason,
-      status: order.status,
-      notes: order.notes,
-      items: order.items.map((item) => ({
-        id: item.id,
-        productId: item.productId,
-        productCode: item.product.code,
-        productDescription: item.product.description,
-        quantityOrdered: item.quantityOrdered,
-        quantityReceived: item.quantityReceived,
-        catalogUnitPrice: item.catalogUnitPrice.toFixed(2),
-        purchaseUnitPrice: item.purchaseUnitPrice.toFixed(2),
-        originalUnitPrice: item.originalUnitPrice.toFixed(2),
-        expirationDate: item.expirationDate?.toISOString().slice(0, 10) ?? null,
-        notes: item.notes,
-      })),
-      createdAt: order.createdAt.toISOString(),
-      updatedAt: order.updatedAt.toISOString(),
-    };
   }
 }

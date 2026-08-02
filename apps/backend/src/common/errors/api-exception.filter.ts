@@ -28,6 +28,8 @@ import { InvalidOrderItemError } from '../../modules/orders/domain/errors/invali
 import { InvalidOrderNotesError } from '../../modules/orders/domain/errors/invalid-order-notes.error';
 import { OrderBrandInactiveError } from '../../modules/orders/domain/errors/order-brand-inactive.error';
 import { OrderBrandMismatchError } from '../../modules/orders/domain/errors/order-brand-mismatch.error';
+import { OrderNotEditableError } from '../../modules/orders/domain/errors/order-not-editable.error';
+import { OrderNotFoundError } from '../../modules/orders/domain/errors/order-not-found.error';
 import { OrderProductInactiveError } from '../../modules/orders/domain/errors/order-product-inactive.error';
 import { InactiveProductBrandError } from '../../modules/products/domain/errors/inactive-product-brand.error';
 import { InactiveProductCategoryError } from '../../modules/products/domain/errors/inactive-product-category.error';
@@ -201,6 +203,14 @@ export class ApiExceptionFilter implements ExceptionFilter {
       };
     }
 
+    if (exception instanceof OrderNotFoundError) {
+      return {
+        status: HttpStatus.NOT_FOUND,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
     if (
       exception instanceof IdempotencyKeyConflictError ||
       exception instanceof IdempotencyRequestInProgressError
@@ -220,6 +230,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
       exception instanceof InvalidOrderNotesError ||
       exception instanceof OrderBrandInactiveError ||
       exception instanceof OrderBrandMismatchError ||
+      exception instanceof OrderNotEditableError ||
       exception instanceof OrderProductInactiveError
     ) {
       return {

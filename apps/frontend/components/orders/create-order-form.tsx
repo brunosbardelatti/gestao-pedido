@@ -8,8 +8,10 @@ import {
   ClipboardPlus,
   LoaderCircle,
   Plus,
+  Save,
   Trash2,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -81,11 +83,35 @@ const createOrderSchema = z
 
 type CreateOrderFields = z.infer<typeof createOrderSchema>;
 
+export type OrderFormInitialValues = CreateOrderFields;
+
+export interface HistoricalOrderProduct {
+  id: string;
+  brandId: string;
+  code: string;
+  description: string;
+  catalogPrice: string;
+  purchasePrice: string;
+  originalPrice: string;
+}
+
+type OrderFormProduct = ProductDetails | HistoricalOrderProduct;
+
 interface CreateOrderFormProps {
   brands: CatalogOption[];
-  products: ProductDetails[];
+  products: OrderFormProduct[];
   initialOrderDate: string;
   referenceError?: string;
+}
+
+export interface OrderFormProps {
+  intent: 'create' | 'update';
+  orderId?: string;
+  brands: CatalogOption[];
+  products: OrderFormProduct[];
+  initialValues: OrderFormInitialValues;
+  referenceError?: string;
+  onUpdated?: () => void;
 }
 
 interface ApiErrorEnvelope {
@@ -120,14 +146,25 @@ function normalizeMoney(input: string): string {
   return `${integer}.${rawFraction.padEnd(2, '0')}`;
 }
 
-export function CreateOrderForm({
+function productBrandId(product: OrderFormProduct): string {
+  return 'brandId' in product ? product.brandId : product.brand.id;
+}
+
+export function OrderForm({
+  intent,
+  orderId,
   brands,
   products,
-  initialOrderDate,
+  initialValues,
   referenceError,
-}: CreateOrderFormProps): React.JSX.Element {
+  onUpdated,
+}: OrderFormProps): React.JSX.Element {
+  const isUpdate = intent === 'update';
   const [requestError, setRequestError] = useState<string | null>(null);
-  const [createdCycle, setCreatedCycle] = useState<string | null>(null);
+  const [success, setSuccess] = useState<{
+    id: string;
+    cycle: string;
+  } | null>(null);
   const [attempt, setAttempt] = useState<{
     payload: string;
     key: string;
@@ -141,13 +178,7 @@ export function CreateOrderForm({
     formState: { errors, isSubmitting },
   } = useForm<CreateOrderFields>({
     resolver: zodResolver(createOrderSchema),
-    defaultValues: {
-      brandId: '',
-      cycle: '',
-      orderDate: initialOrderDate,
-      notes: '',
-      items: [emptyItem()],
-    },
+    defaultValues: initialValues,
   });
   const { fields, append, remove, replace } = useFieldArray({
     control,
@@ -156,7 +187,7 @@ export function CreateOrderForm({
   const brandId = useWatch({ control, name: 'brandId' });
   const watchedItems = useWatch({ control, name: 'items' });
   const availableProducts = products.filter(
-    (product) => product.brand.id === brandId,
+    (product) => productBrandId(product) === brandId,
   );
   const brandRegistration = register('brandId');
   const catalogAvailable = brands.length > 0 && products.length > 0;
@@ -177,7 +208,7 @@ export function CreateOrderForm({
 
   async function submit(fieldsValue: CreateOrderFields): Promise<void> {
     setRequestError(null);
-    setCreatedCycle(null);
+    setSuccess(null);
 
     const payload = {
       brandId: fieldsValue.brandId,
@@ -195,43 +226,58 @@ export function CreateOrderForm({
     };
     const serializedPayload = JSON.stringify(payload);
     let currentAttempt = attempt;
-    if (!currentAttempt || currentAttempt.payload !== serializedPayload) {
-      currentAttempt = {
-        payload: serializedPayload,
-        key: crypto.randomUUID(),
-      };
+    if (!isUpdate && (!currentAttempt || currentAttempt.payload !== serializedPayload)) {
+      currentAttempt = { payload: serializedPayload, key: crypto.randomUUID() };
       setAttempt(currentAttempt);
     }
 
     try {
-      const response = await fetch(`${apiUrl}/api/v1/orders`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Idempotency-Key': currentAttempt.key,
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (!isUpdate && currentAttempt) {
+        headers['Idempotency-Key'] = currentAttempt.key;
+      }
+      const response = await fetch(
+        isUpdate
+          ? `${apiUrl}/api/v1/orders/${orderId}`
+          : `${apiUrl}/api/v1/orders`,
+        {
+          method: isUpdate ? 'PUT' : 'POST',
+          credentials: 'include',
+          headers,
+          body: serializedPayload,
         },
-        body: serializedPayload,
-      });
+      );
 
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as ApiErrorEnvelope;
         setRequestError(
-          body.error?.message ?? 'Não foi possível criar o pedido.',
+          body.error?.message ??
+            (isUpdate
+              ? 'Não foi possível atualizar o pedido.'
+              : 'Não foi possível criar o pedido.'),
         );
         return;
       }
 
       const body = (await response.json()) as CreateOrderResponse;
-      setCreatedCycle(body.data.cycle);
-      setAttempt(null);
-      reset({
-        brandId: '',
-        cycle: '',
-        orderDate: initialOrderDate,
-        notes: '',
-        items: [emptyItem()],
-      });
+      setSuccess(body.data);
+      if (isUpdate) {
+        reset({
+          ...fieldsValue,
+          cycle: fieldsValue.cycle.trim(),
+          notes: fieldsValue.notes.trim(),
+          items: payload.items.map((item) => ({
+            ...item,
+            notes: item.notes ?? '',
+          })),
+        });
+        onUpdated?.();
+      } else {
+        setAttempt(null);
+        reset(initialValues);
+      }
     } catch {
       setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
     }
@@ -454,13 +500,27 @@ export function CreateOrderForm({
           <span>{requestError}</span>
         </div>
       ) : null}
-      {createdCycle ? (
+      {success ? (
         <div
           role="status"
           className="mt-5 flex items-start gap-2 border-l-2 border-ring bg-muted px-3 py-2.5 text-sm text-foreground"
         >
           <CircleCheck className="mt-0.5 size-4 shrink-0 text-ring" aria-hidden />
-          <span>Pedido do ciclo {createdCycle} criado.</span>
+          <span>
+            Pedido do ciclo {success.cycle}{' '}
+            {isUpdate ? 'atualizado.' : 'criado.'}
+            {!isUpdate ? (
+              <>
+                {' '}
+                <Link
+                  href={`/orders/${success.id}/edit`}
+                  className="font-semibold text-ring hover:underline"
+                >
+                  Editar pedido
+                </Link>
+              </>
+            ) : null}
+          </span>
         </div>
       ) : null}
 
@@ -472,15 +532,38 @@ export function CreateOrderForm({
         {isSubmitting ? (
           <>
             <LoaderCircle className="size-4 animate-spin" aria-hidden />
-            Criando pedido
+            {isUpdate ? 'Salvando alterações' : 'Criando pedido'}
           </>
         ) : (
           <>
-            <ClipboardPlus className="size-4" aria-hidden />
-            Criar pedido
+            {isUpdate ? (
+              <Save className="size-4" aria-hidden />
+            ) : (
+              <ClipboardPlus className="size-4" aria-hidden />
+            )}
+            {isUpdate ? 'Salvar alterações' : 'Criar pedido'}
           </>
         )}
       </Button>
     </form>
+  );
+}
+
+export function CreateOrderForm({
+  initialOrderDate,
+  ...props
+}: CreateOrderFormProps): React.JSX.Element {
+  return (
+    <OrderForm
+      intent="create"
+      initialValues={{
+        brandId: '',
+        cycle: '',
+        orderDate: initialOrderDate,
+        notes: '',
+        items: [emptyItem()],
+      }}
+      {...props}
+    />
   );
 }
