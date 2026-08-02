@@ -24,6 +24,7 @@ import { DuplicateReceiptItemError } from '../../modules/orders/domain/errors/du
 import { IdempotencyKeyConflictError } from '../../modules/orders/domain/errors/idempotency-key-conflict.error';
 import { IdempotencyRequestInProgressError } from '../../modules/orders/domain/errors/idempotency-request-in-progress.error';
 import { InvalidExpirationDateError } from '../../modules/orders/domain/errors/invalid-expiration-date.error';
+import { InvalidOrderCancelReasonError } from '../../modules/orders/domain/errors/invalid-order-cancel-reason.error';
 import { InvalidOrderCycleError } from '../../modules/orders/domain/errors/invalid-order-cycle.error';
 import { InvalidOrderDateError } from '../../modules/orders/domain/errors/invalid-order-date.error';
 import { InvalidOrderItemError } from '../../modules/orders/domain/errors/invalid-order-item.error';
@@ -31,6 +32,7 @@ import { InvalidOrderNotesError } from '../../modules/orders/domain/errors/inval
 import { InvalidReceiptItemError } from '../../modules/orders/domain/errors/invalid-receipt-item.error';
 import { OrderBrandInactiveError } from '../../modules/orders/domain/errors/order-brand-inactive.error';
 import { OrderBrandMismatchError } from '../../modules/orders/domain/errors/order-brand-mismatch.error';
+import { OrderNotCancelableError } from '../../modules/orders/domain/errors/order-not-cancelable.error';
 import { OrderNotEditableError } from '../../modules/orders/domain/errors/order-not-editable.error';
 import { OrderNotFoundError } from '../../modules/orders/domain/errors/order-not-found.error';
 import { OrderNotReceivableError } from '../../modules/orders/domain/errors/order-not-receivable.error';
@@ -232,6 +234,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
       exception instanceof DuplicateOrderProductError ||
       exception instanceof DuplicateReceiptItemError ||
       exception instanceof InvalidExpirationDateError ||
+      exception instanceof InvalidOrderCancelReasonError ||
       exception instanceof InvalidOrderCycleError ||
       exception instanceof InvalidOrderDateError ||
       exception instanceof InvalidOrderItemError ||
@@ -239,6 +242,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
       exception instanceof InvalidReceiptItemError ||
       exception instanceof OrderBrandInactiveError ||
       exception instanceof OrderBrandMismatchError ||
+      exception instanceof OrderNotCancelableError ||
       exception instanceof OrderNotEditableError ||
       exception instanceof OrderNotReceivableError ||
       exception instanceof OrderProductInactiveError ||

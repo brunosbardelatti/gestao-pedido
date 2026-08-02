@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
 import { AppHeader } from '@/components/layout/app-header';
+import { CancelOrderSection } from '@/components/orders/cancel-order-section';
 import {
   type HistoricalOrderProduct,
 } from '@/components/orders/create-order-form';
@@ -116,6 +117,7 @@ export default async function EditOrderPage({
                   Receber pedido
                 </Link>
               </div>
+              <CancelOrderSection orderId={order.id} cycle={order.cycle} />
             </>
           ) : (
             <div

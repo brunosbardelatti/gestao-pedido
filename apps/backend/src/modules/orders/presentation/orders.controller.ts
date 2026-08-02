@@ -15,10 +15,12 @@ import {
 
 import type { RequestWithId } from '../../../common/http/request-with-id';
 import { GetCurrentUserUseCase } from '../../auth/application/use-cases/get-current-user.use-case';
+import { CancelOrderUseCase } from '../application/use-cases/cancel-order.use-case';
 import { CreateOrderUseCase } from '../application/use-cases/create-order.use-case';
 import { GetOrderUseCase } from '../application/use-cases/get-order.use-case';
 import { ReceiveOrderUseCase } from '../application/use-cases/receive-order.use-case';
 import { UpdateOrderUseCase } from '../application/use-cases/update-order.use-case';
+import { CancelOrderDto } from './dto/cancel-order.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ReceiveOrderDto } from './dto/receive-order.dto';
 
@@ -29,6 +31,8 @@ export class OrdersController {
   constructor(
     @Inject(GetCurrentUserUseCase)
     private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
+    @Inject(CancelOrderUseCase)
+    private readonly cancelOrderUseCase: CancelOrderUseCase,
     @Inject(CreateOrderUseCase)
     private readonly createOrderUseCase: CreateOrderUseCase,
     @Inject(GetOrderUseCase)
@@ -82,6 +86,35 @@ export class OrdersController {
       orderDate: input.orderDate,
       notes: input.notes,
       items: input.items,
+      requestId: request.requestId,
+    });
+
+    return { data: order };
+  }
+
+  @Post(':id/cancel')
+  @HttpCode(HttpStatus.OK)
+  async cancel(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) orderId: string,
+    @Body(
+      new ValidationPipe({
+        expectedType: CancelOrderDto,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    )
+    input: CancelOrderDto,
+    @Req() request: RequestWithId,
+  ) {
+    const cookies = request.cookies as Record<string, string | undefined>;
+    const actor = await this.getCurrentUserUseCase.execute({
+      token: cookies.session,
+    });
+    const order = await this.cancelOrderUseCase.execute({
+      actorId: actor.id,
+      orderId,
+      reason: input.reason,
       requestId: request.requestId,
     });
 
