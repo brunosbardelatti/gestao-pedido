@@ -2514,7 +2514,9 @@ components:
         originalPrice:
           $ref: '#/components/schemas/Money'
         suggestedSalePrice:
-          $ref: '#/components/schemas/Money'
+          oneOf:
+          - $ref: '#/components/schemas/Money'
+          - type: 'null'
         active:
           type: boolean
         createdAt:
@@ -2532,7 +2534,6 @@ components:
       - catalogPrice
       - purchasePrice
       - originalPrice
-      - suggestedSalePrice
       properties:
         brandId:
           $ref: '#/components/schemas/Uuid'
@@ -2553,7 +2554,9 @@ components:
         originalPrice:
           $ref: '#/components/schemas/Money'
         suggestedSalePrice:
-          $ref: '#/components/schemas/Money'
+          oneOf:
+          - $ref: '#/components/schemas/Money'
+          - type: 'null'
       additionalProperties: false
     OrderItem:
       type: object

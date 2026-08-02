@@ -4,15 +4,19 @@ import { AuthModule } from '../auth/auth.module';
 import type { CreateCategoryPersistence } from './application/ports/create-category-persistence';
 import {
   CREATE_CATEGORY_PERSISTENCE,
+  LIST_CATEGORIES_PERSISTENCE,
   SET_CATEGORY_ACTIVE_PERSISTENCE,
   UPDATE_CATEGORY_PERSISTENCE,
 } from './application/ports/categories.tokens';
+import type { ListCategoriesPersistence } from './application/ports/list-categories-persistence';
 import type { SetCategoryActivePersistence } from './application/ports/set-category-active-persistence';
 import type { UpdateCategoryPersistence } from './application/ports/update-category-persistence';
 import { CreateCategoryUseCase } from './application/use-cases/create-category.use-case';
+import { ListCategoriesUseCase } from './application/use-cases/list-categories.use-case';
 import { SetCategoryActiveUseCase } from './application/use-cases/set-category-active.use-case';
 import { UpdateCategoryUseCase } from './application/use-cases/update-category.use-case';
 import { PrismaCreateCategoryPersistence } from './infrastructure/persistence/prisma-create-category.persistence';
+import { PrismaListCategoriesPersistence } from './infrastructure/persistence/prisma-list-categories.persistence';
 import { PrismaSetCategoryActivePersistence } from './infrastructure/persistence/prisma-set-category-active.persistence';
 import { PrismaUpdateCategoryPersistence } from './infrastructure/persistence/prisma-update-category.persistence';
 import { CategoriesController } from './presentation/categories.controller';
@@ -22,11 +26,16 @@ import { CategoriesController } from './presentation/categories.controller';
   controllers: [CategoriesController],
   providers: [
     PrismaCreateCategoryPersistence,
+    PrismaListCategoriesPersistence,
     PrismaSetCategoryActivePersistence,
     PrismaUpdateCategoryPersistence,
     {
       provide: CREATE_CATEGORY_PERSISTENCE,
       useExisting: PrismaCreateCategoryPersistence,
+    },
+    {
+      provide: LIST_CATEGORIES_PERSISTENCE,
+      useExisting: PrismaListCategoriesPersistence,
     },
     {
       provide: SET_CATEGORY_ACTIVE_PERSISTENCE,
@@ -41,6 +50,12 @@ import { CategoriesController } from './presentation/categories.controller';
       inject: [CREATE_CATEGORY_PERSISTENCE],
       useFactory: (persistence: CreateCategoryPersistence) =>
         new CreateCategoryUseCase(persistence),
+    },
+    {
+      provide: ListCategoriesUseCase,
+      inject: [LIST_CATEGORIES_PERSISTENCE],
+      useFactory: (persistence: ListCategoriesPersistence) =>
+        new ListCategoriesUseCase(persistence),
     },
     {
       provide: SetCategoryActiveUseCase,

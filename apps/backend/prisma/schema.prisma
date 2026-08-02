@@ -183,7 +183,7 @@ model Product {
   catalogPrice       Decimal  @map("catalog_price") @db.Decimal(12, 2)
   purchasePrice      Decimal  @map("purchase_price") @db.Decimal(12, 2)
   originalPrice      Decimal  @map("original_price") @db.Decimal(12, 2)
-  suggestedSalePrice Decimal  @map("suggested_sale_price") @db.Decimal(12, 2)
+  suggestedSalePrice Decimal? @map("suggested_sale_price") @db.Decimal(12, 2)
   active             Boolean  @default(true)
   createdById        String   @map("created_by_id") @db.Uuid
   updatedById        String   @map("updated_by_id") @db.Uuid

@@ -1,12 +1,14 @@
 import {
   Body,
   Controller,
+  Get,
   Inject,
   Param,
   Patch,
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
   Req,
   ValidationPipe,
 } from '@nestjs/common';
@@ -14,9 +16,11 @@ import {
 import type { RequestWithId } from '../../../common/http/request-with-id';
 import { GetCurrentUserUseCase } from '../../auth/application/use-cases/get-current-user.use-case';
 import { CreateBrandUseCase } from '../application/use-cases/create-brand.use-case';
+import { ListBrandsUseCase } from '../application/use-cases/list-brands.use-case';
 import { SetBrandActiveUseCase } from '../application/use-cases/set-brand-active.use-case';
 import { UpdateBrandUseCase } from '../application/use-cases/update-brand.use-case';
 import { CreateBrandDto } from './dto/create-brand.dto';
+import { ListBrandsQueryDto } from './dto/list-brands-query.dto';
 import { SetBrandActiveDto } from './dto/set-brand-active.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
 
@@ -27,11 +31,33 @@ export class BrandsController {
     private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
     @Inject(CreateBrandUseCase)
     private readonly createBrandUseCase: CreateBrandUseCase,
+    @Inject(ListBrandsUseCase)
+    private readonly listBrandsUseCase: ListBrandsUseCase,
     @Inject(UpdateBrandUseCase)
     private readonly updateBrandUseCase: UpdateBrandUseCase,
     @Inject(SetBrandActiveUseCase)
     private readonly setBrandActiveUseCase: SetBrandActiveUseCase,
   ) {}
+
+  @Get()
+  async list(
+    @Query(
+      new ValidationPipe({
+        expectedType: ListBrandsQueryDto,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    )
+    query: ListBrandsQueryDto,
+    @Req() request: RequestWithId,
+  ) {
+    const cookies = request.cookies as Record<string, string | undefined>;
+    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    const result = await this.listBrandsUseCase.execute(query);
+
+    return { data: result.items, meta: result.meta };
+  }
 
   @Post()
   async create(

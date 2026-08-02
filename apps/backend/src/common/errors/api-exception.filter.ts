@@ -19,6 +19,12 @@ import { InvalidBrandNameError } from '../../modules/brands/domain/errors/invali
 import { CategoryAlreadyExistsError } from '../../modules/categories/domain/errors/category-already-exists.error';
 import { CategoryNotFoundError } from '../../modules/categories/domain/errors/category-not-found.error';
 import { InvalidCategoryNameError } from '../../modules/categories/domain/errors/invalid-category-name.error';
+import { InactiveProductBrandError } from '../../modules/products/domain/errors/inactive-product-brand.error';
+import { InactiveProductCategoryError } from '../../modules/products/domain/errors/inactive-product-category.error';
+import { InvalidProductCodeError } from '../../modules/products/domain/errors/invalid-product-code.error';
+import { InvalidProductDescriptionError } from '../../modules/products/domain/errors/invalid-product-description.error';
+import { InvalidProductPriceError } from '../../modules/products/domain/errors/invalid-product-price.error';
+import { ProductAlreadyExistsError } from '../../modules/products/domain/errors/product-already-exists.error';
 import type { RequestWithId } from '../http/request-with-id';
 
 interface HttpExceptionBody {
@@ -147,6 +153,28 @@ export class ApiExceptionFilter implements ExceptionFilter {
     }
 
     if (exception instanceof InvalidCategoryNameError) {
+      return {
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof ProductAlreadyExistsError) {
+      return {
+        status: HttpStatus.CONFLICT,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (
+      exception instanceof InactiveProductBrandError ||
+      exception instanceof InactiveProductCategoryError ||
+      exception instanceof InvalidProductCodeError ||
+      exception instanceof InvalidProductDescriptionError ||
+      exception instanceof InvalidProductPriceError
+    ) {
       return {
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         code: exception.code,

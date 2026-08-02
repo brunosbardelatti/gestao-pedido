@@ -74,7 +74,7 @@ CUSTOMER ||--o{ SALE : realiza
 - category_id
 - code
 - description
-- suggested_price
+- suggested_price (opcional)
 - active
 
 **Constraint**
