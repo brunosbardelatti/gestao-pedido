@@ -8,6 +8,7 @@ import {
   ShoppingBag,
   Tags,
   UserPlus,
+  Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -85,6 +86,10 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               <p>Os próximos fluxos serão adicionados por caso de uso.</p>
             </div>
             <div className="workspace-actions">
+              <Link href="/customers" className="workspace-action">
+                <Users className="size-4" aria-hidden />
+                Consultar clientes
+              </Link>
               <Link href="/orders" className="workspace-action">
                 <ClipboardList className="size-4" aria-hidden />
                 Consultar pedidos

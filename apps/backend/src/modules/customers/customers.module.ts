@@ -5,15 +5,19 @@ import type { CreateCustomerPersistence } from './application/ports/create-custo
 import {
   CREATE_CUSTOMER_PERSISTENCE,
   GET_CUSTOMER_PERSISTENCE,
+  LIST_CUSTOMERS_PERSISTENCE,
   UPDATE_CUSTOMER_PERSISTENCE,
 } from './application/ports/customers.tokens';
 import type { GetCustomerPersistence } from './application/ports/get-customer-persistence';
+import type { ListCustomersPersistence } from './application/ports/list-customers-persistence';
 import type { UpdateCustomerPersistence } from './application/ports/update-customer-persistence';
 import { CreateCustomerUseCase } from './application/use-cases/create-customer.use-case';
 import { GetCustomerUseCase } from './application/use-cases/get-customer.use-case';
+import { ListCustomersUseCase } from './application/use-cases/list-customers.use-case';
 import { UpdateCustomerUseCase } from './application/use-cases/update-customer.use-case';
 import { PrismaCreateCustomerPersistence } from './infrastructure/persistence/prisma-create-customer.persistence';
 import { PrismaGetCustomerPersistence } from './infrastructure/persistence/prisma-get-customer.persistence';
+import { PrismaListCustomersPersistence } from './infrastructure/persistence/prisma-list-customers.persistence';
 import { PrismaUpdateCustomerPersistence } from './infrastructure/persistence/prisma-update-customer.persistence';
 import { CustomersController } from './presentation/customers.controller';
 
@@ -23,6 +27,7 @@ import { CustomersController } from './presentation/customers.controller';
   providers: [
     PrismaCreateCustomerPersistence,
     PrismaGetCustomerPersistence,
+    PrismaListCustomersPersistence,
     PrismaUpdateCustomerPersistence,
     {
       provide: CREATE_CUSTOMER_PERSISTENCE,
@@ -35,6 +40,10 @@ import { CustomersController } from './presentation/customers.controller';
     {
       provide: UPDATE_CUSTOMER_PERSISTENCE,
       useExisting: PrismaUpdateCustomerPersistence,
+    },
+    {
+      provide: LIST_CUSTOMERS_PERSISTENCE,
+      useExisting: PrismaListCustomersPersistence,
     },
     {
       provide: CreateCustomerUseCase,
@@ -53,6 +62,12 @@ import { CustomersController } from './presentation/customers.controller';
       inject: [UPDATE_CUSTOMER_PERSISTENCE],
       useFactory: (persistence: UpdateCustomerPersistence) =>
         new UpdateCustomerUseCase(persistence),
+    },
+    {
+      provide: ListCustomersUseCase,
+      inject: [LIST_CUSTOMERS_PERSISTENCE],
+      useFactory: (persistence: ListCustomersPersistence) =>
+        new ListCustomersUseCase(persistence),
     },
   ],
 })
