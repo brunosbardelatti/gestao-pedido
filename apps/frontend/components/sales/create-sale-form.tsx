@@ -22,6 +22,7 @@ import type {
   SaleCustomerReference,
   SaleProductReference,
 } from '@/lib/sales';
+import { CancelSaleSection } from './cancel-sale-section';
 
 const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -119,7 +120,7 @@ export function CreateSaleForm({
   referenceError,
 }: CreateSaleFormProps): React.JSX.Element {
   const [requestError, setRequestError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<{ total: string } | null>(null);
+  const [success, setSuccess] = useState<{ id: string; total: string } | null>(null);
   const [attempt, setAttempt] = useState<{ payload: string; key: string } | null>(
     null,
   );
@@ -199,7 +200,7 @@ export function CreateSaleForm({
       }
       const body = (await response.json()) as SaleResponse;
       setAttempt(null);
-      setSuccess({ total: body.data.total });
+      setSuccess({ id: body.data.id, total: body.data.total });
       reset(initialValues());
     } catch {
       setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
@@ -381,6 +382,9 @@ export function CreateSaleForm({
           <><ShoppingCart className="size-4" aria-hidden />Registrar venda</>
         )}
       </Button>
+      {success ? (
+        <CancelSaleSection saleId={success.id} total={success.total} />
+      ) : null}
     </form>
   );
 }

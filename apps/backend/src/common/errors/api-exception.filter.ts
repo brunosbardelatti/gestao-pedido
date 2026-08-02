@@ -55,11 +55,14 @@ import { ProductAlreadyExistsError } from '../../modules/products/domain/errors/
 import { ProductNotFoundError } from '../../modules/products/domain/errors/product-not-found.error';
 import { DuplicateSaleProductError } from '../../modules/sales/domain/errors/duplicate-sale-product.error';
 import { InvalidSaleItemError } from '../../modules/sales/domain/errors/invalid-sale-item.error';
+import { InvalidSaleCancelReasonError } from '../../modules/sales/domain/errors/invalid-sale-cancel-reason.error';
 import { InvalidSalePaymentMethodError } from '../../modules/sales/domain/errors/invalid-sale-payment-method.error';
 import { SaleCustomerInactiveError } from '../../modules/sales/domain/errors/sale-customer-inactive.error';
 import { SaleCustomerNotFoundError } from '../../modules/sales/domain/errors/sale-customer-not-found.error';
 import { SaleIdempotencyKeyConflictError } from '../../modules/sales/domain/errors/sale-idempotency-key-conflict.error';
 import { SaleIdempotencyRequestInProgressError } from '../../modules/sales/domain/errors/sale-idempotency-request-in-progress.error';
+import { SaleNotCancelableError } from '../../modules/sales/domain/errors/sale-not-cancelable.error';
+import { SaleNotFoundError } from '../../modules/sales/domain/errors/sale-not-found.error';
 import { SaleProductInactiveError } from '../../modules/sales/domain/errors/sale-product-inactive.error';
 import { SaleProductNotFoundError } from '../../modules/sales/domain/errors/sale-product-not-found.error';
 import type { RequestWithId } from '../http/request-with-id';
@@ -296,9 +299,11 @@ export class ApiExceptionFilter implements ExceptionFilter {
       exception instanceof ReceivedQuantityExceededError
       || exception instanceof DuplicateSaleProductError
       || exception instanceof InvalidSaleItemError
+      || exception instanceof InvalidSaleCancelReasonError
       || exception instanceof InvalidSalePaymentMethodError
       || exception instanceof SaleCustomerInactiveError
       || exception instanceof SaleProductInactiveError
+      || exception instanceof SaleNotCancelableError
     ) {
       return {
         status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -309,7 +314,8 @@ export class ApiExceptionFilter implements ExceptionFilter {
 
     if (
       exception instanceof SaleCustomerNotFoundError ||
-      exception instanceof SaleProductNotFoundError
+      exception instanceof SaleProductNotFoundError ||
+      exception instanceof SaleNotFoundError
     ) {
       return {
         status: HttpStatus.NOT_FOUND,
