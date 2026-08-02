@@ -2,13 +2,17 @@ import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { DeactivateCategoryButton } from '@/components/categories/deactivate-category-button';
 import { UpdateCategoryForm } from '@/components/categories/update-category-form';
 import { AppHeader } from '@/components/layout/app-header';
 import { getCurrentUser } from '@/lib/auth';
 
 interface EditCategoryPageProps {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ name?: string | string[] }>;
+  searchParams: Promise<{
+    name?: string | string[];
+    active?: string | string[];
+  }>;
 }
 
 export default async function EditCategoryPage({
@@ -24,6 +28,7 @@ export default async function EditCategoryPage({
   const { id } = await params;
   const query = await searchParams;
   const initialName = typeof query.name === 'string' ? query.name.slice(0, 100) : '';
+  const initialActive = query.active !== 'false';
 
   return (
     <main className="min-h-svh bg-background text-foreground">
@@ -39,7 +44,17 @@ export default async function EditCategoryPage({
         <div className="mt-8">
           <p className="section-kicker">Catálogo</p>
           <h1 className="mt-2 text-2xl font-semibold">Editar categoria</h1>
-          <UpdateCategoryForm categoryId={id} initialName={initialName} />
+          <UpdateCategoryForm
+            key={`${id}-${initialActive}`}
+            categoryId={id}
+            initialName={initialName}
+            initialActive={initialActive}
+          />
+          <DeactivateCategoryButton
+            categoryId={id}
+            categoryName={initialName}
+            initialActive={initialActive}
+          />
         </div>
       </section>
     </main>

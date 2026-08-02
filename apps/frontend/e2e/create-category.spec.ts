@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('creates, updates and prevents a case-insensitive duplicate category', async ({
+test('creates, updates, deactivates and prevents a duplicate category', async ({
   page,
 }) => {
   const categoryName = `Categoria E2E ${Date.now()}`;
@@ -36,6 +36,19 @@ test('creates, updates and prevents a case-insensitive duplicate category', asyn
   await expect(page.getByRole('status')).toContainText(
     `Categoria ${updatedName} atualizada.`,
   );
+
+  await page.getByRole('button', { name: 'Inativar categoria' }).click();
+  await expect(
+    page.getByRole('group', {
+      name: `Confirmar inativação de ${updatedName}`,
+    }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Confirmar inativação' }).click();
+  await expect(
+    page.getByRole('status').filter({
+      hasText: `Categoria ${updatedName} inativada.`,
+    }),
+  ).toContainText(`Categoria ${updatedName} inativada.`);
 
   await page.goto('/categories/new');
   await page.getByLabel('Nome da categoria').fill(updatedName.toUpperCase());

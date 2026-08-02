@@ -92,7 +92,7 @@ describe('UpdateCategoryForm', () => {
       'Perfumaria Feminina',
     );
     expect(replace).toHaveBeenCalledWith(
-      '/categories/category-id/edit?name=Perfumaria%20Feminina',
+      '/categories/category-id/edit?name=Perfumaria%20Feminina&active=true',
       { scroll: false },
     );
   });

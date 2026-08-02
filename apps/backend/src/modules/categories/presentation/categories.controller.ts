@@ -3,9 +3,10 @@ import {
   Controller,
   Inject,
   Param,
+  Patch,
+  ParseUUIDPipe,
   Post,
   Put,
-  ParseUUIDPipe,
   Req,
   ValidationPipe,
 } from '@nestjs/common';
@@ -13,8 +14,10 @@ import {
 import type { RequestWithId } from '../../../common/http/request-with-id';
 import { GetCurrentUserUseCase } from '../../auth/application/use-cases/get-current-user.use-case';
 import { CreateCategoryUseCase } from '../application/use-cases/create-category.use-case';
+import { SetCategoryActiveUseCase } from '../application/use-cases/set-category-active.use-case';
 import { UpdateCategoryUseCase } from '../application/use-cases/update-category.use-case';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { SetCategoryActiveDto } from './dto/set-category-active.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Controller('categories')
@@ -26,6 +29,8 @@ export class CategoriesController {
     private readonly createCategoryUseCase: CreateCategoryUseCase,
     @Inject(UpdateCategoryUseCase)
     private readonly updateCategoryUseCase: UpdateCategoryUseCase,
+    @Inject(SetCategoryActiveUseCase)
+    private readonly setCategoryActiveUseCase: SetCategoryActiveUseCase,
   ) {}
 
   @Post()
@@ -92,6 +97,42 @@ export class CategoriesController {
       actorId: actor.id,
       categoryId,
       name: input.name,
+      requestId: request.requestId,
+    });
+
+    return { data: category };
+  }
+
+  @Patch(':id/active')
+  async setActive(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) categoryId: string,
+    @Body(
+      new ValidationPipe({
+        expectedType: SetCategoryActiveDto,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    )
+    input: SetCategoryActiveDto,
+    @Req() request: RequestWithId,
+  ): Promise<{
+    data: {
+      id: string;
+      name: string;
+      active: boolean;
+      createdAt: Date;
+      updatedAt: Date;
+    };
+  }> {
+    const cookies = request.cookies as Record<string, string | undefined>;
+    const actor = await this.getCurrentUserUseCase.execute({
+      token: cookies.session,
+    });
+    const category = await this.setCategoryActiveUseCase.execute({
+      actorId: actor.id,
+      categoryId,
+      active: input.active,
       requestId: request.requestId,
     });
 
