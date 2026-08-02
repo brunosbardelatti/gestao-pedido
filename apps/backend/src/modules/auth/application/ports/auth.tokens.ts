@@ -1,0 +1,6 @@
+export const USER_REPOSITORY = Symbol('USER_REPOSITORY');
+export const PASSWORD_HASHER = Symbol('PASSWORD_HASHER');
+export const SESSION_TOKEN_SERVICE = Symbol('SESSION_TOKEN_SERVICE');
+export const LOGIN_PERSISTENCE = Symbol('LOGIN_PERSISTENCE');
+export const SESSION_REPOSITORY = Symbol('SESSION_REPOSITORY');
+export const CLOCK = Symbol('CLOCK');

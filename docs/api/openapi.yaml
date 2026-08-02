@@ -1,0 +1,3267 @@
+openapi: 3.1.0
+jsonSchemaDialect: https://json-schema.org/draft/2020-12/schema
+info:
+  title: Gestão de Pedidos API
+  version: 1.0.0
+  summary: API REST do sistema de gestão para revendedora de cosméticos.
+  description: API First utilizada pelo frontend Next.js e por integrações externas. As operações críticas são transacionais,
+    auditadas e aceitam idempotência quando indicado.
+  contact:
+    name: Equipe do projeto
+  license:
+    name: Proprietary
+servers:
+- url: http://localhost:3001/api/v1
+  description: Desenvolvimento local
+- url: https://{host}/api/v1
+  description: Produção
+  variables:
+    host:
+      default: api.exemplo.com
+      description: Host público configurado na Railway
+tags:
+- name: Health
+  description: Saúde e prontidão da aplicação.
+- name: Auth
+  description: Autenticação e sessão de usuários.
+- name: Users
+  description: Operações administrativas de usuários.
+- name: Brands
+  description: Cadastro de marcas.
+- name: Categories
+  description: Cadastro de categorias.
+- name: Products
+  description: Catálogo de produtos.
+- name: Orders
+  description: Pedidos de compra e recebimento.
+- name: Inventory
+  description: Saldo e movimentações de estoque.
+- name: Customers
+  description: Cadastro opcional de clientes.
+- name: Sales
+  description: Vendas e recibos.
+- name: Reports
+  description: Relatórios operacionais.
+- name: Integrations
+  description: API Keys e importações assistidas.
+paths:
+  /health:
+    get:
+      tags:
+      - Health
+      summary: Verificar saúde da aplicação
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: Aplicação disponível.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /health/ready:
+    get:
+      tags:
+      - Health
+      summary: Verificar prontidão da aplicação e banco
+      operationId: getReadiness
+      security: []
+      responses:
+        '200':
+          description: Aplicação pronta.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+        '503':
+          description: Dependência indisponível.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+  /auth/login:
+    post:
+      tags:
+      - Auth
+      summary: Autenticar usuário
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Sessão criada.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UserSummary'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /auth/logout:
+    post:
+      tags:
+      - Auth
+      summary: Encerrar sessão
+      operationId: logout
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: Sessão encerrada.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /auth/me:
+    get:
+      tags:
+      - Auth
+      summary: Obter usuário autenticado
+      operationId: getCurrentUser
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: Usuário atual.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UserSummary'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /users/{id}/reset-password:
+    post:
+      tags:
+      - Users
+      summary: Redefinir senha manualmente
+      operationId: resetUserPassword
+      security:
+      - cookieAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '204':
+          description: Senha redefinida.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /brands:
+    get:
+      tags:
+      - Brands
+      summary: Listar brands
+      operationId: listBrands
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PageSize'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Lista paginada.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Brand'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags:
+      - Brands
+      summary: Cadastrar brand
+      operationId: createBrand
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BrandInput'
+      responses:
+        '201':
+          description: Recurso criado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Brand'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /brands/{id}:
+    get:
+      tags:
+      - Brands
+      summary: Obter por ID
+      operationId: getBrand
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: Recurso encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Brand'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags:
+      - Brands
+      summary: Atualizar recurso
+      operationId: updateBrand
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BrandInput'
+      responses:
+        '200':
+          description: Recurso atualizado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Brand'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /brands/{id}/active:
+    patch:
+      tags:
+      - Brands
+      summary: Ativar ou inativar
+      operationId: setBrandActive
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivePatch'
+      responses:
+        '200':
+          description: Situação atualizada.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Brand'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /categories:
+    get:
+      tags:
+      - Categories
+      summary: Listar categories
+      operationId: listCategories
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PageSize'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Lista paginada.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags:
+      - Categories
+      summary: Cadastrar categorie
+      operationId: createCategory
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '201':
+          description: Recurso criado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Category'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /categories/{id}:
+    get:
+      tags:
+      - Categories
+      summary: Obter por ID
+      operationId: getCategory
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: Recurso encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Category'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags:
+      - Categories
+      summary: Atualizar recurso
+      operationId: updateCategory
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '200':
+          description: Recurso atualizado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Category'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /categories/{id}/active:
+    patch:
+      tags:
+      - Categories
+      summary: Ativar ou inativar
+      operationId: setCategoryActive
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivePatch'
+      responses:
+        '200':
+          description: Situação atualizada.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Category'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /products:
+    get:
+      tags:
+      - Products
+      summary: Listar products
+      operationId: listProducts
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PageSize'
+      - $ref: '#/components/parameters/Search'
+      - name: brandId
+        in: query
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: categoryId
+        in: query
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: active
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Lista paginada.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags:
+      - Products
+      summary: Cadastrar product
+      operationId: createProduct
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '201':
+          description: Recurso criado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Product'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /products/{id}:
+    get:
+      tags:
+      - Products
+      summary: Obter por ID
+      operationId: getProduct
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: Recurso encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Product'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags:
+      - Products
+      summary: Atualizar recurso
+      operationId: updateProduct
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '200':
+          description: Recurso atualizado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Product'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /products/{id}/active:
+    patch:
+      tags:
+      - Products
+      summary: Ativar ou inativar
+      operationId: setProductActive
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivePatch'
+      responses:
+        '200':
+          description: Situação atualizada.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Product'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /orders:
+    get:
+      tags:
+      - Orders
+      summary: Listar pedidos
+      operationId: listOrders
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PageSize'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/OrderStatus'
+      - name: brandId
+        in: query
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: cycle
+        in: query
+        schema:
+          type: string
+      - name: startDate
+        in: query
+        schema:
+          $ref: '#/components/schemas/Date'
+      - name: endDate
+        in: query
+        schema:
+          $ref: '#/components/schemas/Date'
+      responses:
+        '200':
+          description: Pedidos paginados.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags:
+      - Orders
+      summary: Criar pedido
+      operationId: createOrder
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Pedido criado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Order'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /orders/{id}:
+    get:
+      tags:
+      - Orders
+      summary: Obter pedido
+      operationId: getOrder
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: Pedido encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Order'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags:
+      - Orders
+      summary: Editar pedido em aberto
+      operationId: updateOrder
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: Pedido atualizado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Order'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /orders/{id}/receive:
+    post:
+      tags:
+      - Orders
+      summary: Receber pedido
+      operationId: receiveOrder
+      description: Confirma quantidades recebidas e cria movimentações de entrada em uma única transação.
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReceiveOrderRequest'
+      responses:
+        '200':
+          description: Pedido recebido.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Order'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /orders/{id}/cancel:
+    post:
+      tags:
+      - Orders
+      summary: Cancelar pedido
+      operationId: cancelOrder
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelRequest'
+      responses:
+        '200':
+          description: Pedido cancelado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Order'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /inventory:
+    get:
+      tags:
+      - Inventory
+      summary: Consultar estoque atual
+      operationId: getInventory
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PageSize'
+      - $ref: '#/components/parameters/Search'
+      - name: brandId
+        in: query
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: categoryId
+        in: query
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: negativeOnly
+        in: query
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: Saldo atual.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InventoryBalance'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /inventory/movements:
+    get:
+      tags:
+      - Inventory
+      summary: Listar movimentações
+      operationId: listInventoryMovements
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PageSize'
+      - name: productId
+        in: query
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: type
+        in: query
+        schema:
+          $ref: '#/components/schemas/InventoryMovementType'
+      - name: startDate
+        in: query
+        schema:
+          $ref: '#/components/schemas/Date'
+      - name: endDate
+        in: query
+        schema:
+          $ref: '#/components/schemas/Date'
+      responses:
+        '200':
+          description: Movimentações paginadas.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InventoryMovement'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /inventory/adjustments:
+    post:
+      tags:
+      - Inventory
+      summary: Registrar ajuste de estoque
+      operationId: adjustInventory
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryAdjustmentRequest'
+      responses:
+        '201':
+          description: Ajuste registrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/InventoryMovement'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /customers:
+    get:
+      tags:
+      - Customers
+      summary: Listar customers
+      operationId: listCustomers
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PageSize'
+      - $ref: '#/components/parameters/Search'
+      - name: cpf
+        in: query
+        schema:
+          type: string
+          pattern: ^\d{11}$
+      - name: phone
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Lista paginada.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Customer'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags:
+      - Customers
+      summary: Cadastrar customer
+      operationId: createCustomer
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInput'
+      responses:
+        '201':
+          description: Recurso criado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Customer'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /customers/{id}:
+    get:
+      tags:
+      - Customers
+      summary: Obter por ID
+      operationId: getCustomer
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: Recurso encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Customer'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags:
+      - Customers
+      summary: Atualizar recurso
+      operationId: updateCustomer
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInput'
+      responses:
+        '200':
+          description: Recurso atualizado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Customer'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /sales:
+    get:
+      tags:
+      - Sales
+      summary: Listar vendas
+      operationId: listSales
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PageSize'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/SaleStatus'
+      - name: customerId
+        in: query
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - name: startDate
+        in: query
+        schema:
+          $ref: '#/components/schemas/Date'
+      - name: endDate
+        in: query
+        schema:
+          $ref: '#/components/schemas/Date'
+      responses:
+        '200':
+          description: Vendas paginadas.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Sale'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags:
+      - Sales
+      summary: Registrar venda
+      operationId: createSale
+      description: Registra a venda, snapshots de preço/custo e movimentações de saída em uma única transação.
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSaleRequest'
+      responses:
+        '201':
+          description: Venda registrada.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Sale'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /sales/{id}:
+    get:
+      tags:
+      - Sales
+      summary: Obter venda
+      operationId: getSale
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: Venda encontrada.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Sale'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /sales/{id}/cancel:
+    post:
+      tags:
+      - Sales
+      summary: Cancelar venda
+      operationId: cancelSale
+      description: Cancela a venda e cria movimentações de estorno sem apagar o histórico.
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelRequest'
+      responses:
+        '200':
+          description: Venda cancelada.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Sale'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /sales/{id}/receipt:
+    get:
+      tags:
+      - Sales
+      summary: Baixar recibo em PDF
+      operationId: downloadSaleReceipt
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: Recibo não fiscal.
+          headers:
+            Content-Disposition:
+              description: Nome sugerido para download.
+              schema:
+                type: string
+                example: attachment; filename="venda.pdf"
+          content:
+            application/pdf:
+              schema:
+                type: string
+                contentEncoding: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /reports/inventory:
+    get:
+      tags:
+      - Reports
+      summary: Relatório de estoque
+      operationId: getInventoryReport
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PageSize'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Relatório de estoque.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InventoryBalance'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /reports/expirations:
+    get:
+      tags:
+      - Reports
+      summary: Relatório de vencimentos
+      operationId: getExpirationReport
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PageSize'
+      - name: fromDate
+        in: query
+        schema:
+          $ref: '#/components/schemas/Date'
+      - name: toDate
+        in: query
+        schema:
+          $ref: '#/components/schemas/Date'
+      - name: withinDays
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 7
+      responses:
+        '200':
+          description: Itens ordenados por vencimento.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ExpirationReportItem'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /reports/sales:
+    get:
+      tags:
+      - Reports
+      summary: Relatório de vendas
+      operationId: getSalesReport
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - name: startDate
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Date'
+      - name: endDate
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Date'
+      - name: includeCanceled
+        in: query
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: Consolidado de vendas.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SalesReport'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /reports/margins:
+    get:
+      tags:
+      - Reports
+      summary: Relatório de margem
+      operationId: getMarginReport
+      description: Utiliza os snapshots de custo e venda persistidos nos itens.
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PageSize'
+      - name: startDate
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Date'
+      - name: endDate
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Date'
+      - name: productId
+        in: query
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: Margem por produto.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MarginReportItem'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /integrations/api-keys:
+    get:
+      tags:
+      - Integrations
+      summary: Listar API Keys
+      operationId: listApiKeys
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: API Keys sem segredo.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApiKey'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags:
+      - Integrations
+      summary: Criar API Key
+      operationId: createApiKey
+      security:
+      - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApiKeyRequest'
+      responses:
+        '201':
+          description: Chave criada. O segredo é exibido uma única vez.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CreateApiKeyResponse'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /integrations/api-keys/{id}:
+    delete:
+      tags:
+      - Integrations
+      summary: Revogar API Key
+      operationId: revokeApiKey
+      security:
+      - cookieAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '204':
+          description: API Key revogada.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /integrations/nfe-xml:
+    post:
+      tags:
+      - Integrations
+      summary: Importar XML de NF-e
+      operationId: importNfeXml
+      description: Cria um rascunho para revisão humana. Não recebe pedido nem altera estoque.
+      security:
+      - cookieAuth: []
+      - apiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  contentMediaType: application/xml
+                  contentEncoding: binary
+      responses:
+        '201':
+          description: Rascunho criado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ImportedOrderDraft'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /integrations/imported-orders/{id}/approve:
+    post:
+      tags:
+      - Integrations
+      summary: Aprovar pedido importado
+      operationId: approveImportedOrder
+      description: Converte o rascunho revisado em pedido OPEN. Não altera estoque.
+      security:
+      - cookieAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApproveImportedOrderRequest'
+      responses:
+        '201':
+          description: Pedido aberto criado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Order'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/BusinessRuleViolation'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '409':
+          $ref: '#/components/responses/Conflict'
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session
+      description: Cookie HTTP-only, Secure e SameSite configurado após login.
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Chave de integração. O servidor persiste apenas o hash.
+  parameters:
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Página solicitada.
+    PageSize:
+      name: pageSize
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Quantidade de registros por página.
+    Search:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 120
+      description: Busca textual.
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Identificador único da tentativa. Repetições retornam o resultado previamente persistido.
+    RequestId:
+      name: X-Request-ID
+      in: header
+      required: false
+      schema:
+        type: string
+        maxLength: 100
+      description: Identificador de correlação opcional.
+  headers:
+    RequestId:
+      description: Identificador de correlação da requisição.
+      schema:
+        type: string
+  responses:
+    BadRequest:
+      description: Requisição inválida.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Unauthorized:
+      description: Não autenticado.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Forbidden:
+      description: Operação não permitida.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    NotFound:
+      description: Recurso não encontrado.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Conflict:
+      description: Conflito de unicidade, estado ou idempotência.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    BusinessRuleViolation:
+      description: Regra de negócio violada.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    InternalError:
+      description: Erro interno sem exposição de stack trace.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+  schemas:
+    Uuid:
+      type: string
+      format: uuid
+    Date:
+      type: string
+      format: date
+    DateTime:
+      type: string
+      format: date-time
+    Money:
+      type: string
+      pattern: ^\d+(\.\d{1,2})?$
+      examples:
+      - '49.90'
+      description: Valor decimal serializado como string para evitar perda de precisão.
+    PaginationMeta:
+      type: object
+      required:
+      - page
+      - pageSize
+      - total
+      - totalPages
+      properties:
+        page:
+          type: integer
+          minimum: 1
+        pageSize:
+          type: integer
+          minimum: 1
+        total:
+          type: integer
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+      additionalProperties: false
+    ErrorDetail:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          examples:
+          - ORDER_NOT_FOUND
+        message:
+          type: string
+          examples:
+          - Pedido não encontrado.
+        field:
+          type:
+          - string
+          - 'null'
+        details:
+          type:
+          - object
+          - array
+          - 'null'
+        requestId:
+          type:
+          - string
+          - 'null'
+      additionalProperties: false
+    ErrorEnvelope:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+      additionalProperties: false
+    UserRole:
+      type: string
+      enum:
+      - ADMIN
+      - OPERATOR
+    OrderStatus:
+      type: string
+      enum:
+      - OPEN
+      - RECEIVED
+      - CANCELED
+    SaleStatus:
+      type: string
+      enum:
+      - COMPLETED
+      - CANCELED
+    PaymentMethod:
+      type: string
+      enum:
+      - CASH
+      - PIX
+      - DEBIT_CARD
+      - CREDIT_CARD
+      - BANK_TRANSFER
+      - OTHER
+    InventoryMovementType:
+      type: string
+      enum:
+      - PURCHASE
+      - SALE
+      - SALE_CANCELLATION
+      - CORRECTION
+      - PERSONAL_USE
+      - RETURN
+    ApiKeyStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - REVOKED
+    UserSummary:
+      type: object
+      required:
+      - id
+      - name
+      - login
+      - role
+      - active
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        name:
+          type: string
+        login:
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+        active:
+          type: boolean
+      additionalProperties: false
+    LoginRequest:
+      type: object
+      required:
+      - login
+      - password
+      properties:
+        login:
+          type: string
+          minLength: 1
+          maxLength: 80
+        password:
+          type: string
+          minLength: 8
+          maxLength: 128
+      additionalProperties: false
+    ResetPasswordRequest:
+      type: object
+      required:
+      - newPassword
+      properties:
+        newPassword:
+          type: string
+          minLength: 8
+          maxLength: 128
+      additionalProperties: false
+    ActivePatch:
+      type: object
+      required:
+      - active
+      properties:
+        active:
+          type: boolean
+      additionalProperties: false
+    Brand:
+      type: object
+      required:
+      - id
+      - name
+      - active
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        name:
+          type: string
+        active:
+          type: boolean
+        createdAt:
+          $ref: '#/components/schemas/DateTime'
+        updatedAt:
+          $ref: '#/components/schemas/DateTime'
+      additionalProperties: false
+    BrandInput:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+      additionalProperties: false
+    Category:
+      type: object
+      required:
+      - id
+      - name
+      - active
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        name:
+          type: string
+        active:
+          type: boolean
+        createdAt:
+          $ref: '#/components/schemas/DateTime'
+        updatedAt:
+          $ref: '#/components/schemas/DateTime'
+      additionalProperties: false
+    CategoryInput:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+      additionalProperties: false
+    Product:
+      type: object
+      required:
+      - id
+      - brand
+      - category
+      - code
+      - description
+      - catalogPrice
+      - purchasePrice
+      - originalPrice
+      - suggestedSalePrice
+      - active
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        brand:
+          $ref: '#/components/schemas/Brand'
+        category:
+          $ref: '#/components/schemas/Category'
+        code:
+          type: string
+        description:
+          type: string
+        catalogPrice:
+          $ref: '#/components/schemas/Money'
+        purchasePrice:
+          $ref: '#/components/schemas/Money'
+        originalPrice:
+          $ref: '#/components/schemas/Money'
+        suggestedSalePrice:
+          $ref: '#/components/schemas/Money'
+        active:
+          type: boolean
+        createdAt:
+          $ref: '#/components/schemas/DateTime'
+        updatedAt:
+          $ref: '#/components/schemas/DateTime'
+      additionalProperties: false
+    ProductInput:
+      type: object
+      required:
+      - brandId
+      - categoryId
+      - code
+      - description
+      - catalogPrice
+      - purchasePrice
+      - originalPrice
+      - suggestedSalePrice
+      properties:
+        brandId:
+          $ref: '#/components/schemas/Uuid'
+        categoryId:
+          $ref: '#/components/schemas/Uuid'
+        code:
+          type: string
+          minLength: 1
+          maxLength: 80
+        description:
+          type: string
+          minLength: 1
+          maxLength: 255
+        catalogPrice:
+          $ref: '#/components/schemas/Money'
+        purchasePrice:
+          $ref: '#/components/schemas/Money'
+        originalPrice:
+          $ref: '#/components/schemas/Money'
+        suggestedSalePrice:
+          $ref: '#/components/schemas/Money'
+      additionalProperties: false
+    OrderItem:
+      type: object
+      required:
+      - id
+      - productId
+      - productCode
+      - productDescription
+      - quantityOrdered
+      - quantityReceived
+      - catalogUnitPrice
+      - purchaseUnitPrice
+      - originalUnitPrice
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        productId:
+          $ref: '#/components/schemas/Uuid'
+        productCode:
+          type: string
+        productDescription:
+          type: string
+        quantityOrdered:
+          type: integer
+          minimum: 1
+        quantityReceived:
+          type: integer
+          minimum: 0
+        catalogUnitPrice:
+          $ref: '#/components/schemas/Money'
+        purchaseUnitPrice:
+          $ref: '#/components/schemas/Money'
+        originalUnitPrice:
+          $ref: '#/components/schemas/Money'
+        expirationDate:
+          oneOf:
+          - $ref: '#/components/schemas/Date'
+          - type: 'null'
+        notes:
+          type:
+          - string
+          - 'null'
+      additionalProperties: false
+    Order:
+      type: object
+      required:
+      - id
+      - brand
+      - cycle
+      - orderDate
+      - status
+      - items
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        brand:
+          $ref: '#/components/schemas/Brand'
+        cycle:
+          type: string
+        orderDate:
+          $ref: '#/components/schemas/Date'
+        receivedAt:
+          oneOf:
+          - $ref: '#/components/schemas/DateTime'
+          - type: 'null'
+        canceledAt:
+          oneOf:
+          - $ref: '#/components/schemas/DateTime'
+          - type: 'null'
+        cancelReason:
+          type:
+          - string
+          - 'null'
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        notes:
+          type:
+          - string
+          - 'null'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+          minItems: 1
+        createdAt:
+          $ref: '#/components/schemas/DateTime'
+        updatedAt:
+          $ref: '#/components/schemas/DateTime'
+      additionalProperties: false
+    CreateOrderItemInput:
+      type: object
+      required:
+      - productId
+      - quantityOrdered
+      - catalogUnitPrice
+      - purchaseUnitPrice
+      - originalUnitPrice
+      properties:
+        productId:
+          $ref: '#/components/schemas/Uuid'
+        quantityOrdered:
+          type: integer
+          minimum: 1
+        catalogUnitPrice:
+          $ref: '#/components/schemas/Money'
+        purchaseUnitPrice:
+          $ref: '#/components/schemas/Money'
+        originalUnitPrice:
+          $ref: '#/components/schemas/Money'
+        notes:
+          type:
+          - string
+          - 'null'
+          maxLength: 500
+      additionalProperties: false
+    CreateOrderRequest:
+      type: object
+      required:
+      - brandId
+      - cycle
+      - orderDate
+      - items
+      properties:
+        brandId:
+          $ref: '#/components/schemas/Uuid'
+        cycle:
+          type: string
+          minLength: 1
+          maxLength: 80
+        orderDate:
+          $ref: '#/components/schemas/Date'
+        notes:
+          type:
+          - string
+          - 'null'
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CreateOrderItemInput'
+      additionalProperties: false
+    ReceiveOrderItemInput:
+      type: object
+      required:
+      - orderItemId
+      - quantityReceived
+      properties:
+        orderItemId:
+          $ref: '#/components/schemas/Uuid'
+        quantityReceived:
+          type: integer
+          minimum: 0
+        expirationDate:
+          oneOf:
+          - $ref: '#/components/schemas/Date'
+          - type: 'null'
+        notes:
+          type:
+          - string
+          - 'null'
+          maxLength: 500
+      additionalProperties: false
+    ReceiveOrderRequest:
+      type: object
+      required:
+      - items
+      properties:
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ReceiveOrderItemInput'
+      additionalProperties: false
+    CancelRequest:
+      type: object
+      required:
+      - reason
+      properties:
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+      additionalProperties: false
+    InventoryBalance:
+      type: object
+      required:
+      - productId
+      - productCode
+      - description
+      - brandName
+      - balance
+      properties:
+        productId:
+          $ref: '#/components/schemas/Uuid'
+        productCode:
+          type: string
+        description:
+          type: string
+        brandName:
+          type: string
+        balance:
+          type: integer
+        suggestedSalePrice:
+          $ref: '#/components/schemas/Money'
+      additionalProperties: false
+    InventoryMovement:
+      type: object
+      required:
+      - id
+      - productId
+      - type
+      - quantityDelta
+      - createdAt
+      - createdBy
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        productId:
+          $ref: '#/components/schemas/Uuid'
+        type:
+          $ref: '#/components/schemas/InventoryMovementType'
+        quantityDelta:
+          type: integer
+          not:
+            const: 0
+        reason:
+          type:
+          - string
+          - 'null'
+        orderItemId:
+          oneOf:
+          - $ref: '#/components/schemas/Uuid'
+          - type: 'null'
+        saleItemId:
+          oneOf:
+          - $ref: '#/components/schemas/Uuid'
+          - type: 'null'
+        createdBy:
+          $ref: '#/components/schemas/UserSummary'
+        createdAt:
+          $ref: '#/components/schemas/DateTime'
+      additionalProperties: false
+    InventoryAdjustmentRequest:
+      type: object
+      required:
+      - productId
+      - type
+      - quantityDelta
+      - reason
+      properties:
+        productId:
+          $ref: '#/components/schemas/Uuid'
+        type:
+          type: string
+          enum:
+          - CORRECTION
+          - PERSONAL_USE
+          - RETURN
+        quantityDelta:
+          type: integer
+          not:
+            const: 0
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+        confirmNegativeStock:
+          type: boolean
+          default: false
+      additionalProperties: false
+    Customer:
+      type: object
+      required:
+      - id
+      - name
+      - active
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        name:
+          type: string
+        cpf:
+          type:
+          - string
+          - 'null'
+          pattern: ^\d{11}$
+        phone:
+          type:
+          - string
+          - 'null'
+        addressLine:
+          type:
+          - string
+          - 'null'
+        city:
+          type:
+          - string
+          - 'null'
+        state:
+          type:
+          - string
+          - 'null'
+          minLength: 2
+          maxLength: 2
+        postalCode:
+          type:
+          - string
+          - 'null'
+          pattern: ^\d{8}$
+        active:
+          type: boolean
+        createdAt:
+          $ref: '#/components/schemas/DateTime'
+        updatedAt:
+          $ref: '#/components/schemas/DateTime'
+      additionalProperties: false
+    CustomerInput:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        cpf:
+          type:
+          - string
+          - 'null'
+          pattern: ^\d{11}$
+        phone:
+          type:
+          - string
+          - 'null'
+          maxLength: 20
+        addressLine:
+          type:
+          - string
+          - 'null'
+          maxLength: 255
+        city:
+          type:
+          - string
+          - 'null'
+          maxLength: 100
+        state:
+          type:
+          - string
+          - 'null'
+          minLength: 2
+          maxLength: 2
+        postalCode:
+          type:
+          - string
+          - 'null'
+          pattern: ^\d{8}$
+      additionalProperties: false
+    SaleItem:
+      type: object
+      required:
+      - id
+      - productId
+      - productCode
+      - productDescription
+      - quantity
+      - unitPrice
+      - unitCostSnapshot
+      - subtotal
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        productId:
+          $ref: '#/components/schemas/Uuid'
+        productCode:
+          type: string
+        productDescription:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        unitCostSnapshot:
+          $ref: '#/components/schemas/Money'
+        subtotal:
+          $ref: '#/components/schemas/Money'
+      additionalProperties: false
+    Sale:
+      type: object
+      required:
+      - id
+      - status
+      - saleDate
+      - total
+      - items
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        customer:
+          oneOf:
+          - $ref: '#/components/schemas/Customer'
+          - type: 'null'
+        status:
+          $ref: '#/components/schemas/SaleStatus'
+        saleDate:
+          $ref: '#/components/schemas/DateTime'
+        paymentMethod:
+          oneOf:
+          - $ref: '#/components/schemas/PaymentMethod'
+          - type: 'null'
+        total:
+          $ref: '#/components/schemas/Money'
+        notes:
+          type:
+          - string
+          - 'null'
+        canceledAt:
+          oneOf:
+          - $ref: '#/components/schemas/DateTime'
+          - type: 'null'
+        cancelReason:
+          type:
+          - string
+          - 'null'
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/SaleItem'
+        createdAt:
+          $ref: '#/components/schemas/DateTime'
+        updatedAt:
+          $ref: '#/components/schemas/DateTime'
+      additionalProperties: false
+    CreateSaleItemInput:
+      type: object
+      required:
+      - productId
+      - quantity
+      - unitPrice
+      properties:
+        productId:
+          $ref: '#/components/schemas/Uuid'
+        quantity:
+          type: integer
+          minimum: 1
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+      additionalProperties: false
+    CreateSaleRequest:
+      type: object
+      required:
+      - items
+      properties:
+        customerId:
+          oneOf:
+          - $ref: '#/components/schemas/Uuid'
+          - type: 'null'
+        paymentMethod:
+          oneOf:
+          - $ref: '#/components/schemas/PaymentMethod'
+          - type: 'null'
+        notes:
+          type:
+          - string
+          - 'null'
+        confirmNegativeStock:
+          type: boolean
+          default: false
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CreateSaleItemInput'
+      additionalProperties: false
+    ExpirationReportItem:
+      type: object
+      required:
+      - orderItemId
+      - productId
+      - productCode
+      - description
+      - expirationDate
+      - quantityReceived
+      properties:
+        orderItemId:
+          $ref: '#/components/schemas/Uuid'
+        productId:
+          $ref: '#/components/schemas/Uuid'
+        productCode:
+          type: string
+        description:
+          type: string
+        expirationDate:
+          $ref: '#/components/schemas/Date'
+        quantityReceived:
+          type: integer
+          minimum: 0
+        daysUntilExpiration:
+          type: integer
+        note:
+          type: string
+          description: O relatório é indicativo porque o MVP não consome estoque por lote.
+      additionalProperties: false
+    SalesReport:
+      type: object
+      required:
+      - startDate
+      - endDate
+      - salesCount
+      - itemsCount
+      - revenue
+      properties:
+        startDate:
+          $ref: '#/components/schemas/Date'
+        endDate:
+          $ref: '#/components/schemas/Date'
+        salesCount:
+          type: integer
+          minimum: 0
+        itemsCount:
+          type: integer
+          minimum: 0
+        revenue:
+          $ref: '#/components/schemas/Money'
+      additionalProperties: false
+    MarginReportItem:
+      type: object
+      required:
+      - productId
+      - productCode
+      - description
+      - quantitySold
+      - revenue
+      - cost
+      - margin
+      properties:
+        productId:
+          $ref: '#/components/schemas/Uuid'
+        productCode:
+          type: string
+        description:
+          type: string
+        quantitySold:
+          type: integer
+          minimum: 0
+        revenue:
+          $ref: '#/components/schemas/Money'
+        cost:
+          $ref: '#/components/schemas/Money'
+        margin:
+          $ref: '#/components/schemas/Money'
+        marginPercent:
+          type:
+          - number
+          - 'null'
+          format: double
+      additionalProperties: false
+    ApiKey:
+      type: object
+      required:
+      - id
+      - name
+      - keyPrefix
+      - scopes
+      - status
+      - createdAt
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        name:
+          type: string
+        keyPrefix:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+        status:
+          $ref: '#/components/schemas/ApiKeyStatus'
+        expiresAt:
+          oneOf:
+          - $ref: '#/components/schemas/DateTime'
+          - type: 'null'
+        lastUsedAt:
+          oneOf:
+          - $ref: '#/components/schemas/DateTime'
+          - type: 'null'
+        createdAt:
+          $ref: '#/components/schemas/DateTime'
+      additionalProperties: false
+    CreateApiKeyRequest:
+      type: object
+      required:
+      - name
+      - scopes
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        scopes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        expiresAt:
+          oneOf:
+          - $ref: '#/components/schemas/DateTime'
+          - type: 'null'
+      additionalProperties: false
+    CreateApiKeyResponse:
+      type: object
+      required:
+      - apiKey
+      - secret
+      properties:
+        apiKey:
+          $ref: '#/components/schemas/ApiKey'
+        secret:
+          type: string
+          description: Exibido uma única vez. O servidor armazena apenas o hash.
+      additionalProperties: false
+    ImportedOrderDraft:
+      type: object
+      required:
+      - id
+      - status
+      - source
+      - createdAt
+      - extractedData
+      - validationIssues
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        status:
+          type: string
+          enum:
+          - PENDING_REVIEW
+          - APPROVED
+          - REJECTED
+        source:
+          type: string
+          enum:
+          - NFE_XML
+        createdAt:
+          $ref: '#/components/schemas/DateTime'
+        extractedData:
+          type: object
+          additionalProperties: true
+        validationIssues:
+          type: array
+          items:
+            type: object
+            required:
+            - code
+            - message
+            properties:
+              code:
+                type: string
+              message:
+                type: string
+              field:
+                type:
+                - string
+                - 'null'
+      additionalProperties: false
+    ApproveImportedOrderRequest:
+      type: object
+      required:
+      - order
+      properties:
+        order:
+          $ref: '#/components/schemas/CreateOrderRequest'
+      additionalProperties: false
+    HealthStatus:
+      type: object
+      required:
+      - status
+      - timestamp
+      properties:
+        status:
+          type: string
+          enum:
+          - ok
+          - degraded
+        timestamp:
+          $ref: '#/components/schemas/DateTime'
+        checks:
+          type: object
+          additionalProperties:
+            type: string
+      additionalProperties: false
+security:
+- cookieAuth: []
+- apiKeyAuth: []
+x-architecture:
+  style: API First
+  backend: NestJS + TypeScript
+  persistence: PostgreSQL + Prisma
+  organization: Clean Architecture + Vertical Slice
+x-documentation:
+  prd: docs/product/01-PRD-Tecnico.md
+  api: docs/architecture/05-Especificacao-API-REST.md
+  specifications: docs/specifications/
