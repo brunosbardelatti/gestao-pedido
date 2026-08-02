@@ -17,6 +17,7 @@ import { BrandAlreadyExistsError } from '../../modules/brands/domain/errors/bran
 import { BrandNotFoundError } from '../../modules/brands/domain/errors/brand-not-found.error';
 import { InvalidBrandNameError } from '../../modules/brands/domain/errors/invalid-brand-name.error';
 import { CategoryAlreadyExistsError } from '../../modules/categories/domain/errors/category-already-exists.error';
+import { CategoryNotFoundError } from '../../modules/categories/domain/errors/category-not-found.error';
 import { InvalidCategoryNameError } from '../../modules/categories/domain/errors/invalid-category-name.error';
 import type { RequestWithId } from '../http/request-with-id';
 
@@ -132,6 +133,14 @@ export class ApiExceptionFilter implements ExceptionFilter {
     if (exception instanceof CategoryAlreadyExistsError) {
       return {
         status: HttpStatus.CONFLICT,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof CategoryNotFoundError) {
+      return {
+        status: HttpStatus.NOT_FOUND,
         code: exception.code,
         message: exception.message,
       };

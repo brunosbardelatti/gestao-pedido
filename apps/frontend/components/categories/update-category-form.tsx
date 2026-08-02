@@ -2,14 +2,8 @@
 
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  AlertCircle,
-  CircleCheck,
-  LoaderCircle,
-  Pencil,
-  Plus,
-} from 'lucide-react';
-import Link from 'next/link';
+import { AlertCircle, CircleCheck, LoaderCircle, Save } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -17,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-const createCategorySchema = z.object({
+const updateCategorySchema = z.object({
   name: z
     .string()
     .trim()
@@ -25,7 +19,12 @@ const createCategorySchema = z.object({
     .max(100, 'O nome deve ter no máximo 100 caracteres.'),
 });
 
-type CreateCategoryFields = z.infer<typeof createCategorySchema>;
+type UpdateCategoryFields = z.infer<typeof updateCategorySchema>;
+
+interface UpdateCategoryFormProps {
+  categoryId: string;
+  initialName: string;
+}
 
 interface ApiErrorEnvelope {
   error?: {
@@ -33,42 +32,38 @@ interface ApiErrorEnvelope {
   };
 }
 
-interface CreateCategoryResponse {
+interface UpdateCategoryResponse {
   data: {
-    id: string;
     name: string;
   };
 }
 
-interface CreatedCategory {
-  id: string;
-  name: string;
-}
-
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
-export function CreateCategoryForm(): React.JSX.Element {
+export function UpdateCategoryForm({
+  categoryId,
+  initialName,
+}: UpdateCategoryFormProps): React.JSX.Element {
+  const router = useRouter();
   const [requestError, setRequestError] = useState<string | null>(null);
-  const [createdCategory, setCreatedCategory] =
-    useState<CreatedCategory | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
     reset,
-    setFocus,
     formState: { errors, isSubmitting },
-  } = useForm<CreateCategoryFields>({
-    resolver: zodResolver(createCategorySchema),
-    defaultValues: { name: '' },
+  } = useForm<UpdateCategoryFields>({
+    resolver: zodResolver(updateCategorySchema),
+    defaultValues: { name: initialName },
   });
 
-  async function submit(fields: CreateCategoryFields): Promise<void> {
+  async function submit(fields: UpdateCategoryFields): Promise<void> {
     setRequestError(null);
-    setCreatedCategory(null);
+    setSuccessMessage(null);
 
     try {
-      const response = await fetch(`${apiUrl}/api/v1/categories`, {
-        method: 'POST',
+      const response = await fetch(`${apiUrl}/api/v1/categories/${categoryId}`, {
+        method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fields),
@@ -77,15 +72,18 @@ export function CreateCategoryForm(): React.JSX.Element {
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as ApiErrorEnvelope;
         setRequestError(
-          body.error?.message ?? 'Não foi possível cadastrar a categoria.',
+          body.error?.message ?? 'Não foi possível atualizar a categoria.',
         );
         return;
       }
 
-      const body = (await response.json()) as CreateCategoryResponse;
-      reset();
-      setCreatedCategory({ id: body.data.id, name: body.data.name });
-      setFocus('name');
+      const body = (await response.json()) as UpdateCategoryResponse;
+      reset({ name: body.data.name });
+      setSuccessMessage(`Categoria ${body.data.name} atualizada.`);
+      router.replace(
+        `/categories/${categoryId}/edit?name=${encodeURIComponent(body.data.name)}`,
+        { scroll: false },
+      );
     } catch {
       setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
     }
@@ -125,23 +123,13 @@ export function CreateCategoryForm(): React.JSX.Element {
         </div>
       ) : null}
 
-      {createdCategory ? (
+      {successMessage ? (
         <div
           role="status"
           className="mt-5 flex items-start gap-2 border-l-2 border-ring bg-muted px-3 py-2.5 text-sm text-foreground"
         >
           <CircleCheck className="mt-0.5 size-4 shrink-0 text-ring" aria-hidden />
-          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2">
-            <span>Categoria {createdCategory.name} cadastrada.</span>
-            <Link
-              href={`/categories/${createdCategory.id}/edit?name=${encodeURIComponent(createdCategory.name)}`}
-              aria-label={`Editar ${createdCategory.name}`}
-              className="inline-flex min-h-8 items-center gap-1.5 font-semibold text-ring hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <Pencil className="size-3.5" aria-hidden />
-              Editar
-            </Link>
-          </div>
+          <span>{successMessage}</span>
         </div>
       ) : null}
 
@@ -149,12 +137,12 @@ export function CreateCategoryForm(): React.JSX.Element {
         {isSubmitting ? (
           <>
             <LoaderCircle className="size-4 animate-spin" aria-hidden />
-            Cadastrando categoria
+            Salvando alterações
           </>
         ) : (
           <>
-            <Plus className="size-4" aria-hidden />
-            Cadastrar categoria
+            <Save className="size-4" aria-hidden />
+            Salvar alterações
           </>
         )}
       </Button>

@@ -70,6 +70,12 @@ describe('CreateCategoryForm', () => {
     expect(await screen.findByRole('status')).toHaveTextContent(
       'Categoria Perfumaria cadastrada.',
     );
+    expect(
+      screen.getByRole('link', { name: 'Editar Perfumaria' }),
+    ).toHaveAttribute(
+      'href',
+      '/categories/category-id/edit?name=Perfumaria',
+    );
     expect(screen.getByLabelText('Nome da categoria')).toHaveValue('');
   });
 
