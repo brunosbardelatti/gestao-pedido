@@ -58,7 +58,12 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               <h2>Estoque</h2>
               <p>Consulta de saldos e movimentações.</p>
             </div>
-            <span>Em breve</span>
+            <div className="workspace-actions">
+              <Link href="/inventory" className="workspace-action">
+                <PackageSearch className="size-4" aria-hidden />
+                Consultar saldos
+              </Link>
+            </div>
           </div>
           <div className="workspace-row">
             <ShoppingBag aria-hidden />
