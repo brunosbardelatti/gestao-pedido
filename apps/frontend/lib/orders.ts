@@ -46,6 +46,35 @@ interface OrderResponse {
   data: OrderDetails;
 }
 
+export type OrderStatus = OrderDetails['status'];
+
+export interface OrderListQuery {
+  status?: OrderStatus;
+  brandId?: string;
+  cycle?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface OrderListMeta {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface OrderListResult {
+  orders: OrderDetails[];
+  meta: OrderListMeta;
+}
+
+interface OrderListResponse {
+  data: OrderDetails[];
+  meta: OrderListMeta;
+}
+
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export async function getOrder(orderId: string): Promise<OrderDetails | null> {
@@ -59,6 +88,37 @@ export async function getOrder(orderId: string): Promise<OrderDetails | null> {
     if (!response.ok) return null;
 
     return ((await response.json()) as OrderResponse).data;
+  } catch {
+    return null;
+  }
+}
+
+export async function listOrders(
+  query: OrderListQuery,
+): Promise<OrderListResult | null> {
+  const cookieStore = await cookies();
+  const searchParams = new URLSearchParams();
+
+  if (query.status) searchParams.set('status', query.status);
+  if (query.brandId) searchParams.set('brandId', query.brandId);
+  if (query.cycle) searchParams.set('cycle', query.cycle);
+  if (query.startDate) searchParams.set('startDate', query.startDate);
+  if (query.endDate) searchParams.set('endDate', query.endDate);
+  searchParams.set('page', String(query.page ?? 1));
+  searchParams.set('pageSize', String(query.pageSize ?? 20));
+
+  try {
+    const response = await fetch(
+      `${apiUrl}/api/v1/orders?${searchParams.toString()}`,
+      {
+        headers: { Cookie: cookieStore.toString() },
+        cache: 'no-store',
+      },
+    );
+    if (!response.ok) return null;
+
+    const body = (await response.json()) as OrderListResponse;
+    return { orders: body.data, meta: body.meta };
   } catch {
     return null;
   }

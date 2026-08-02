@@ -1,5 +1,6 @@
 import {
   Boxes,
+  ClipboardList,
   ClipboardPlus,
   PackageSearch,
   Plus,
@@ -66,6 +67,10 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               <p>Os próximos fluxos serão adicionados por caso de uso.</p>
             </div>
             <div className="workspace-actions">
+              <Link href="/orders" className="workspace-action">
+                <ClipboardList className="size-4" aria-hidden />
+                Consultar pedidos
+              </Link>
               <Link href="/orders/new" className="workspace-action">
                 <ClipboardPlus className="size-4" aria-hidden />
                 Criar pedido

@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
   Req,
   ValidationPipe,
 } from '@nestjs/common';
@@ -18,10 +19,12 @@ import { GetCurrentUserUseCase } from '../../auth/application/use-cases/get-curr
 import { CancelOrderUseCase } from '../application/use-cases/cancel-order.use-case';
 import { CreateOrderUseCase } from '../application/use-cases/create-order.use-case';
 import { GetOrderUseCase } from '../application/use-cases/get-order.use-case';
+import { ListOrdersUseCase } from '../application/use-cases/list-orders.use-case';
 import { ReceiveOrderUseCase } from '../application/use-cases/receive-order.use-case';
 import { UpdateOrderUseCase } from '../application/use-cases/update-order.use-case';
 import { CancelOrderDto } from './dto/cancel-order.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { ListOrdersQueryDto } from './dto/list-orders-query.dto';
 import { ReceiveOrderDto } from './dto/receive-order.dto';
 
 const idempotencyKeyPipe = new ParseUUIDPipe({ version: '4' });
@@ -37,11 +40,33 @@ export class OrdersController {
     private readonly createOrderUseCase: CreateOrderUseCase,
     @Inject(GetOrderUseCase)
     private readonly getOrderUseCase: GetOrderUseCase,
+    @Inject(ListOrdersUseCase)
+    private readonly listOrdersUseCase: ListOrdersUseCase,
     @Inject(ReceiveOrderUseCase)
     private readonly receiveOrderUseCase: ReceiveOrderUseCase,
     @Inject(UpdateOrderUseCase)
     private readonly updateOrderUseCase: UpdateOrderUseCase,
   ) {}
+
+  @Get()
+  async list(
+    @Query(
+      new ValidationPipe({
+        expectedType: ListOrdersQueryDto,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    )
+    query: ListOrdersQueryDto,
+    @Req() request: RequestWithId,
+  ) {
+    const cookies = request.cookies as Record<string, string | undefined>;
+    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    const result = await this.listOrdersUseCase.execute(query);
+
+    return { data: result.items, meta: result.meta };
+  }
 
   @Get(':id')
   async getById(
