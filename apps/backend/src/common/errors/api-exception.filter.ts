@@ -20,17 +20,23 @@ import { CategoryAlreadyExistsError } from '../../modules/categories/domain/erro
 import { CategoryNotFoundError } from '../../modules/categories/domain/errors/category-not-found.error';
 import { InvalidCategoryNameError } from '../../modules/categories/domain/errors/invalid-category-name.error';
 import { DuplicateOrderProductError } from '../../modules/orders/domain/errors/duplicate-order-product.error';
+import { DuplicateReceiptItemError } from '../../modules/orders/domain/errors/duplicate-receipt-item.error';
 import { IdempotencyKeyConflictError } from '../../modules/orders/domain/errors/idempotency-key-conflict.error';
 import { IdempotencyRequestInProgressError } from '../../modules/orders/domain/errors/idempotency-request-in-progress.error';
+import { InvalidExpirationDateError } from '../../modules/orders/domain/errors/invalid-expiration-date.error';
 import { InvalidOrderCycleError } from '../../modules/orders/domain/errors/invalid-order-cycle.error';
 import { InvalidOrderDateError } from '../../modules/orders/domain/errors/invalid-order-date.error';
 import { InvalidOrderItemError } from '../../modules/orders/domain/errors/invalid-order-item.error';
 import { InvalidOrderNotesError } from '../../modules/orders/domain/errors/invalid-order-notes.error';
+import { InvalidReceiptItemError } from '../../modules/orders/domain/errors/invalid-receipt-item.error';
 import { OrderBrandInactiveError } from '../../modules/orders/domain/errors/order-brand-inactive.error';
 import { OrderBrandMismatchError } from '../../modules/orders/domain/errors/order-brand-mismatch.error';
 import { OrderNotEditableError } from '../../modules/orders/domain/errors/order-not-editable.error';
 import { OrderNotFoundError } from '../../modules/orders/domain/errors/order-not-found.error';
+import { OrderNotReceivableError } from '../../modules/orders/domain/errors/order-not-receivable.error';
 import { OrderProductInactiveError } from '../../modules/orders/domain/errors/order-product-inactive.error';
+import { OrderReceiptItemsMismatchError } from '../../modules/orders/domain/errors/order-receipt-items-mismatch.error';
+import { ReceivedQuantityExceededError } from '../../modules/orders/domain/errors/received-quantity-exceeded.error';
 import { InactiveProductBrandError } from '../../modules/products/domain/errors/inactive-product-brand.error';
 import { InactiveProductCategoryError } from '../../modules/products/domain/errors/inactive-product-category.error';
 import { InvalidProductCodeError } from '../../modules/products/domain/errors/invalid-product-code.error';
@@ -224,14 +230,20 @@ export class ApiExceptionFilter implements ExceptionFilter {
 
     if (
       exception instanceof DuplicateOrderProductError ||
+      exception instanceof DuplicateReceiptItemError ||
+      exception instanceof InvalidExpirationDateError ||
       exception instanceof InvalidOrderCycleError ||
       exception instanceof InvalidOrderDateError ||
       exception instanceof InvalidOrderItemError ||
       exception instanceof InvalidOrderNotesError ||
+      exception instanceof InvalidReceiptItemError ||
       exception instanceof OrderBrandInactiveError ||
       exception instanceof OrderBrandMismatchError ||
       exception instanceof OrderNotEditableError ||
-      exception instanceof OrderProductInactiveError
+      exception instanceof OrderNotReceivableError ||
+      exception instanceof OrderProductInactiveError ||
+      exception instanceof OrderReceiptItemsMismatchError ||
+      exception instanceof ReceivedQuantityExceededError
     ) {
       return {
         status: HttpStatus.UNPROCESSABLE_ENTITY,

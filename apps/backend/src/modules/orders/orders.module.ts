@@ -6,14 +6,18 @@ import type { GetOrderPersistence } from './application/ports/get-order-persiste
 import {
   CREATE_ORDER_PERSISTENCE,
   GET_ORDER_PERSISTENCE,
+  RECEIVE_ORDER_PERSISTENCE,
   UPDATE_ORDER_PERSISTENCE,
 } from './application/ports/orders.tokens';
+import type { ReceiveOrderPersistence } from './application/ports/receive-order-persistence';
 import type { UpdateOrderPersistence } from './application/ports/update-order-persistence';
 import { CreateOrderUseCase } from './application/use-cases/create-order.use-case';
 import { GetOrderUseCase } from './application/use-cases/get-order.use-case';
+import { ReceiveOrderUseCase } from './application/use-cases/receive-order.use-case';
 import { UpdateOrderUseCase } from './application/use-cases/update-order.use-case';
 import { PrismaCreateOrderPersistence } from './infrastructure/persistence/prisma-create-order.persistence';
 import { PrismaGetOrderPersistence } from './infrastructure/persistence/prisma-get-order.persistence';
+import { PrismaReceiveOrderPersistence } from './infrastructure/persistence/prisma-receive-order.persistence';
 import { PrismaUpdateOrderPersistence } from './infrastructure/persistence/prisma-update-order.persistence';
 import { OrdersController } from './presentation/orders.controller';
 
@@ -23,6 +27,7 @@ import { OrdersController } from './presentation/orders.controller';
   providers: [
     PrismaCreateOrderPersistence,
     PrismaGetOrderPersistence,
+    PrismaReceiveOrderPersistence,
     PrismaUpdateOrderPersistence,
     {
       provide: CREATE_ORDER_PERSISTENCE,
@@ -31,6 +36,10 @@ import { OrdersController } from './presentation/orders.controller';
     {
       provide: GET_ORDER_PERSISTENCE,
       useExisting: PrismaGetOrderPersistence,
+    },
+    {
+      provide: RECEIVE_ORDER_PERSISTENCE,
+      useExisting: PrismaReceiveOrderPersistence,
     },
     {
       provide: UPDATE_ORDER_PERSISTENCE,
@@ -47,6 +56,12 @@ import { OrdersController } from './presentation/orders.controller';
       inject: [GET_ORDER_PERSISTENCE],
       useFactory: (persistence: GetOrderPersistence) =>
         new GetOrderUseCase(persistence),
+    },
+    {
+      provide: ReceiveOrderUseCase,
+      inject: [RECEIVE_ORDER_PERSISTENCE],
+      useFactory: (persistence: ReceiveOrderPersistence) =>
+        new ReceiveOrderUseCase(persistence),
     },
     {
       provide: UpdateOrderUseCase,

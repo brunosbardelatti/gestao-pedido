@@ -1,4 +1,4 @@
-import { ArrowLeft, LockKeyhole } from 'lucide-react';
+import { ArrowLeft, LockKeyhole, PackageCheck } from 'lucide-react';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
@@ -7,6 +7,7 @@ import {
   type HistoricalOrderProduct,
 } from '@/components/orders/create-order-form';
 import { UpdateOrderForm } from '@/components/orders/update-order-form';
+import { buttonVariants } from '@/components/ui/button';
 import { getCurrentUser } from '@/lib/auth';
 import type { CatalogOption } from '@/lib/catalog';
 import { getOrder, getOrderCatalog, type OrderDetails } from '@/lib/orders';
@@ -83,28 +84,39 @@ export default async function EditOrderPage({
           <p className="section-kicker">Pedidos</p>
           <h1 className="mt-2 text-2xl font-semibold">Editar pedido</h1>
           {order.status === 'OPEN' ? (
-            <UpdateOrderForm
-              orderId={order.id}
-              brands={brands}
-              products={products}
-              initialValues={{
-                brandId: order.brand.id,
-                cycle: order.cycle,
-                orderDate: order.orderDate,
-                notes: order.notes ?? '',
-                items: order.items.map((item) => ({
-                  productId: item.productId,
-                  quantityOrdered: item.quantityOrdered,
-                  catalogUnitPrice: item.catalogUnitPrice,
-                  purchaseUnitPrice: item.purchaseUnitPrice,
-                  originalUnitPrice: item.originalUnitPrice,
-                  notes: item.notes ?? '',
-                })),
-              }}
-              referenceError={
-                catalog ? undefined : 'Não foi possível carregar o catálogo.'
-              }
-            />
+            <>
+              <UpdateOrderForm
+                orderId={order.id}
+                brands={brands}
+                products={products}
+                initialValues={{
+                  brandId: order.brand.id,
+                  cycle: order.cycle,
+                  orderDate: order.orderDate,
+                  notes: order.notes ?? '',
+                  items: order.items.map((item) => ({
+                    productId: item.productId,
+                    quantityOrdered: item.quantityOrdered,
+                    catalogUnitPrice: item.catalogUnitPrice,
+                    purchaseUnitPrice: item.purchaseUnitPrice,
+                    originalUnitPrice: item.originalUnitPrice,
+                    notes: item.notes ?? '',
+                  })),
+                }}
+                referenceError={
+                  catalog ? undefined : 'Não foi possível carregar o catálogo.'
+                }
+              />
+              <div className="mt-8 max-w-5xl border-t border-border pt-6">
+                <Link
+                  href={`/orders/${order.id}/receive`}
+                  className={buttonVariants()}
+                >
+                  <PackageCheck className="size-4" aria-hidden />
+                  Receber pedido
+                </Link>
+              </div>
+            </>
           ) : (
             <div
               role="status"
