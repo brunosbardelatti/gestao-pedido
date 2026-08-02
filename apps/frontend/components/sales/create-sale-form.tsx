@@ -23,6 +23,7 @@ import type {
   SaleProductReference,
 } from '@/lib/sales';
 import { CancelSaleSection } from './cancel-sale-section';
+import { DownloadSaleReceiptButton } from './download-sale-receipt-button';
 
 const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -383,7 +384,10 @@ export function CreateSaleForm({
         )}
       </Button>
       {success ? (
-        <CancelSaleSection saleId={success.id} total={success.total} />
+        <>
+          <DownloadSaleReceiptButton saleId={success.id} />
+          <CancelSaleSection saleId={success.id} total={success.total} />
+        </>
       ) : null}
     </form>
   );

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Inject,
@@ -8,13 +9,16 @@ import {
   ParseUUIDPipe,
   Post,
   Req,
+  Res,
   ValidationPipe,
 } from '@nestjs/common';
+import type { Response } from 'express';
 
 import type { RequestWithId } from '../../../common/http/request-with-id';
 import { GetCurrentUserUseCase } from '../../auth/application/use-cases/get-current-user.use-case';
 import { CancelSaleUseCase } from '../application/use-cases/cancel-sale.use-case';
 import { CreateSaleUseCase } from '../application/use-cases/create-sale.use-case';
+import { DownloadSaleReceiptUseCase } from '../application/use-cases/download-sale-receipt.use-case';
 import { CancelSaleDto } from './dto/cancel-sale.dto';
 import { CreateSaleDto } from './dto/create-sale.dto';
 
@@ -29,7 +33,34 @@ export class SalesController {
     private readonly cancelSaleUseCase: CancelSaleUseCase,
     @Inject(CreateSaleUseCase)
     private readonly createSaleUseCase: CreateSaleUseCase,
+    @Inject(DownloadSaleReceiptUseCase)
+    private readonly downloadSaleReceiptUseCase: DownloadSaleReceiptUseCase,
   ) {}
+
+  @Get(':id/receipt')
+  async downloadReceipt(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) saleId: string,
+    @Req() request: RequestWithId,
+    @Res() response: Response,
+  ): Promise<void> {
+    const cookies = request.cookies as Record<string, string | undefined>;
+    const actor = await this.getCurrentUserUseCase.execute({
+      token: cookies.session,
+    });
+    const receipt = await this.downloadSaleReceiptUseCase.execute({
+      actorId: actor.id,
+      saleId,
+      requestId: request.requestId,
+    });
+    response
+      .status(HttpStatus.OK)
+      .set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${receipt.filename}"`,
+        'Content-Length': String(receipt.content.byteLength),
+      })
+      .send(receipt.content);
+  }
 
   @Post(':id/cancel')
   @HttpCode(HttpStatus.OK)

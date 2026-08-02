@@ -3,14 +3,21 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import type { CancelSalePersistence } from './application/ports/cancel-sale-persistence';
 import type { CreateSalePersistence } from './application/ports/create-sale-persistence';
+import type { SaleReceiptGenerator } from './application/ports/sale-receipt-generator';
+import type { SaleReceiptPersistence } from './application/ports/sale-receipt-persistence';
 import {
   CANCEL_SALE_PERSISTENCE,
   CREATE_SALE_PERSISTENCE,
+  SALE_RECEIPT_GENERATOR,
+  SALE_RECEIPT_PERSISTENCE,
 } from './application/ports/sales.tokens';
 import { CancelSaleUseCase } from './application/use-cases/cancel-sale.use-case';
 import { CreateSaleUseCase } from './application/use-cases/create-sale.use-case';
+import { DownloadSaleReceiptUseCase } from './application/use-cases/download-sale-receipt.use-case';
+import { PdfkitSaleReceiptGenerator } from './infrastructure/pdf/pdfkit-sale-receipt.generator';
 import { PrismaCancelSalePersistence } from './infrastructure/persistence/prisma-cancel-sale.persistence';
 import { PrismaCreateSalePersistence } from './infrastructure/persistence/prisma-create-sale.persistence';
+import { PrismaSaleReceiptPersistence } from './infrastructure/persistence/prisma-sale-receipt.persistence';
 import { SalesController } from './presentation/sales.controller';
 
 @Module({
@@ -19,8 +26,12 @@ import { SalesController } from './presentation/sales.controller';
   providers: [
     PrismaCancelSalePersistence,
     PrismaCreateSalePersistence,
+    PrismaSaleReceiptPersistence,
+    PdfkitSaleReceiptGenerator,
     { provide: CANCEL_SALE_PERSISTENCE, useExisting: PrismaCancelSalePersistence },
     { provide: CREATE_SALE_PERSISTENCE, useExisting: PrismaCreateSalePersistence },
+    { provide: SALE_RECEIPT_GENERATOR, useExisting: PdfkitSaleReceiptGenerator },
+    { provide: SALE_RECEIPT_PERSISTENCE, useExisting: PrismaSaleReceiptPersistence },
     {
       provide: CancelSaleUseCase,
       inject: [CANCEL_SALE_PERSISTENCE],
@@ -32,6 +43,14 @@ import { SalesController } from './presentation/sales.controller';
       inject: [CREATE_SALE_PERSISTENCE],
       useFactory: (persistence: CreateSalePersistence) =>
         new CreateSaleUseCase(persistence),
+    },
+    {
+      provide: DownloadSaleReceiptUseCase,
+      inject: [SALE_RECEIPT_PERSISTENCE, SALE_RECEIPT_GENERATOR],
+      useFactory: (
+        persistence: SaleReceiptPersistence,
+        generator: SaleReceiptGenerator,
+      ) => new DownloadSaleReceiptUseCase(persistence, generator),
     },
   ],
 })
