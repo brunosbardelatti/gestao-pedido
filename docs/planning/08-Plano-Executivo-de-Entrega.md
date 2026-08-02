@@ -17,6 +17,7 @@ Planejar a execução do MVP em fases incrementais, com entregas pequenas, test�
 | Fase 5 | Vendas | Fluxo operacional completo |
 | Fase 6 | Relatórios | Indicadores do negócio |
 | Fase 7 | API e IA | Plataforma preparada para integrações |
+| Fase 8 | Publicação | Aplicação disponível em produção |
 
 ---
 
@@ -24,7 +25,7 @@ Planejar a execução do MVP em fases incrementais, com entregas pequenas, test�
 
 ## Objetivo
 
-Construir toda a infraestrutura do projeto.
+Construir a fundação técnica necessária para desenvolver e validar a aplicação localmente.
 
 ### Entregáveis
 
@@ -34,20 +35,19 @@ Construir toda a infraestrutura do projeto.
 - Prisma
 - PostgreSQL
 - Docker Compose
-- Railway
 - Login
+- Logout
+- Redefinição manual de senha
 - Auditoria básica
-- Pipeline inicial
 
 ### Milestone M1
 
-**Aplicação executando em produção com autenticação funcional.**
+**Aplicação executando localmente com autenticação funcional.**
 
 **Critério de saída**
 
-- Deploy realizado.
-- Login funcional.
-- Banco operacional.
+- Login, logout e redefinição de senha funcionais.
+- Banco local operacional.
 - Testes iniciais passando.
 
 ---
@@ -139,6 +139,34 @@ Gestão operacional disponível.
 ### Milestone M7
 
 Arquitetura preparada para integrações externas.
+
+---
+
+# Fase 8 — Publicação
+
+### Entregáveis
+
+- Empacotamento de produção com Docker
+- Pipeline de CI/CD
+- Provisionamento dos serviços na Railway
+- Banco PostgreSQL gerenciado
+- Migrações de produção
+- Configuração de domínios e variáveis de ambiente
+- Observabilidade e logs
+- Política de backup e recuperação
+- Validação dos fluxos críticos em produção
+
+### Milestone M8
+
+Aplicação publicada e operacional em produção.
+
+**Critério de saída**
+
+- Pipeline validado.
+- Deploy realizado na Railway.
+- Banco de produção operacional e com backup configurado.
+- Fluxos críticos validados no ambiente publicado.
+- Procedimento de recuperação documentado.
 
 ---
 
