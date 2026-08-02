@@ -19,6 +19,8 @@ import { InvalidBrandNameError } from '../../modules/brands/domain/errors/invali
 import { CategoryAlreadyExistsError } from '../../modules/categories/domain/errors/category-already-exists.error';
 import { CategoryNotFoundError } from '../../modules/categories/domain/errors/category-not-found.error';
 import { InvalidCategoryNameError } from '../../modules/categories/domain/errors/invalid-category-name.error';
+import { CustomerCpfAlreadyExistsError } from '../../modules/customers/domain/errors/customer-cpf-already-exists.error';
+import { InvalidCustomerDataError } from '../../modules/customers/domain/errors/invalid-customer-data.error';
 import { InvalidInventoryAdjustmentError } from '../../modules/inventory/domain/errors/invalid-inventory-adjustment.error';
 import { InventoryIdempotencyKeyConflictError } from '../../modules/inventory/domain/errors/inventory-idempotency-key-conflict.error';
 import { InventoryIdempotencyRequestInProgressError } from '../../modules/inventory/domain/errors/inventory-idempotency-request-in-progress.error';
@@ -178,6 +180,22 @@ export class ApiExceptionFilter implements ExceptionFilter {
     }
 
     if (exception instanceof InvalidCategoryNameError) {
+      return {
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof CustomerCpfAlreadyExistsError) {
+      return {
+        status: HttpStatus.CONFLICT,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof InvalidCustomerDataError) {
       return {
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         code: exception.code,

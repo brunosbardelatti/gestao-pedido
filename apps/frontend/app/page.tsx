@@ -7,6 +7,7 @@ import {
   Plus,
   ShoppingBag,
   Tags,
+  UserPlus,
 } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -91,6 +92,10 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               <Link href="/orders/new" className="workspace-action">
                 <ClipboardPlus className="size-4" aria-hidden />
                 Criar pedido
+              </Link>
+              <Link href="/customers/new" className="workspace-action">
+                <UserPlus className="size-4" aria-hidden />
+                Cadastrar cliente
               </Link>
             </div>
           </div>
