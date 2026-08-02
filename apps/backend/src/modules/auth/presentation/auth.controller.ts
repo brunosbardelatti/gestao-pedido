@@ -14,6 +14,7 @@ import type { Response } from 'express';
 import type { RequestWithId } from '../../../common/http/request-with-id';
 import { LoginUseCase } from '../application/use-cases/login.use-case';
 import { GetCurrentUserUseCase } from '../application/use-cases/get-current-user.use-case';
+import { LogoutUseCase } from '../application/use-cases/logout.use-case';
 import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
@@ -22,6 +23,7 @@ export class AuthController {
     @Inject(LoginUseCase) private readonly loginUseCase: LoginUseCase,
     @Inject(GetCurrentUserUseCase)
     private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
+    @Inject(LogoutUseCase) private readonly logoutUseCase: LogoutUseCase,
   ) {}
 
   @Get('me')
@@ -84,5 +86,26 @@ export class AuthController {
     });
 
     return { data: result.user };
+  }
+
+  @Post('logout')
+  @HttpCode(204)
+  async logout(
+    @Req() request: RequestWithId,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<void> {
+    const cookies = request.cookies as Record<string, string | undefined>;
+
+    await this.logoutUseCase.execute({
+      token: cookies.session,
+      requestId: request.requestId,
+    });
+
+    response.clearCookie('session', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
   }
 }

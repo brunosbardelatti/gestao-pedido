@@ -224,4 +224,91 @@ describe('POST /api/v1/auth/login', () => {
     });
   });
 
+  it('revokes the current session, clears the cookie and records an audit', async () => {
+    const user = await prisma.user.create({
+      data: {
+        name: 'Ana Silva',
+        login: 'ana',
+        normalizedLogin: 'ana',
+        passwordHash,
+        role: UserRole.ADMIN,
+      },
+    });
+    const loginResponse = await request(app.getHttpServer())
+      .post('/api/v1/auth/login')
+      .send({ login: 'ana', password: 'correct-password' })
+      .expect(200);
+    const cookie = loginResponse.headers['set-cookie']?.[0] ?? '';
+
+    const response = await request(app.getHttpServer())
+      .post('/api/v1/auth/logout')
+      .set('Cookie', cookie)
+      .set('x-request-id', 'req-integration-logout')
+      .expect(204);
+
+    expect(response.text).toBe('');
+    expect(response.headers['set-cookie']?.[0]).toMatch(
+      /^session=; Path=\/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax$/,
+    );
+    const session = await prisma.session.findFirstOrThrow({
+      where: { userId: user.id },
+    });
+    expect(session.revokedAt).toBeInstanceOf(Date);
+    expect(await prisma.auditLog.findFirst({
+      where: { action: 'AUTH_LOGOUT', userId: user.id },
+    })).toMatchObject({
+      actorType: 'USER',
+      action: 'AUTH_LOGOUT',
+      entityType: 'User',
+      entityId: user.id,
+      requestId: 'req-integration-logout',
+    });
+
+    await request(app.getHttpServer())
+      .get('/api/v1/auth/me')
+      .set('Cookie', cookie)
+      .expect(401);
+  });
+
+  it('accepts repeated logout without duplicating its audit record', async () => {
+    await prisma.user.create({
+      data: {
+        name: 'Ana Silva',
+        login: 'ana',
+        normalizedLogin: 'ana',
+        passwordHash,
+      },
+    });
+    const loginResponse = await request(app.getHttpServer())
+      .post('/api/v1/auth/login')
+      .send({ login: 'ana', password: 'correct-password' })
+      .expect(200);
+    const cookie = loginResponse.headers['set-cookie']?.[0] ?? '';
+
+    await request(app.getHttpServer())
+      .post('/api/v1/auth/logout')
+      .set('Cookie', cookie)
+      .expect(204);
+    await request(app.getHttpServer())
+      .post('/api/v1/auth/logout')
+      .set('Cookie', cookie)
+      .expect(204);
+
+    expect(
+      await prisma.auditLog.count({ where: { action: 'AUTH_LOGOUT' } }),
+    ).toBe(1);
+  });
+
+  it('rejects logout without a session cookie', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/api/v1/auth/logout')
+      .expect(401);
+
+    expect(response.body.error).toMatchObject({
+      code: 'UNAUTHORIZED',
+      message: 'Autenticação necessária.',
+      requestId: expect.any(String),
+    });
+    expect(await prisma.auditLog.count()).toBe(0);
+  });
 });

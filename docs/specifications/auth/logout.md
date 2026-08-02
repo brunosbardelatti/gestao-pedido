@@ -3,7 +3,7 @@
 - **Status:** Aceita
 - **Domínio:** auth
 - **Tipo:** Especificação Funcional SDD
-- **Versão:** 1.0
+- **Versão:** 1.1
 
 ## Objetivo
 
@@ -24,6 +24,9 @@ Encerrar a sessão autenticada do usuário.
 
 - O logout deve invalidar a sessão atual.
 - A operação deve ser idempotente.
+- Repetir o logout com o mesmo token já revogado retorna `204 No Content` e não duplica a auditoria.
+- Cookie ausente, sessão desconhecida ou expirada retorna `401 Unauthorized`.
+- O cookie de sessão deve ser removido após uma resposta bem-sucedida.
 
 ## Fluxo Principal
 
@@ -46,6 +49,7 @@ Encerrar a sessão autenticada do usuário.
 
 - Após o logout, endpoints protegidos retornam 401.
 - Repetir o logout não causa erro interno.
+- Uma revogação efetiva registra uma única auditoria `AUTH_LOGOUT` com o usuário e o Request ID.
 
 ## Cenários de Teste
 

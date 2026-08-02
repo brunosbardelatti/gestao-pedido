@@ -2,6 +2,8 @@ import { Boxes, PackageCheck, ShoppingBag } from 'lucide-react';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+import { LogoutButton } from '@/components/auth/logout-button';
+
 interface CurrentUser {
   id: string;
   name: string;
@@ -47,11 +49,14 @@ export default async function HomePage(): Promise<React.JSX.Element> {
           </span>
           <span>Gestão de Pedidos</span>
         </div>
-        <div className="ml-auto text-right">
-          <p className="text-sm font-medium">{user.name}</p>
-          <p className="text-xs text-muted-foreground">
-            {user.role === 'ADMIN' ? 'Administrador' : 'Operador'}
-          </p>
+        <div className="ml-auto flex items-center gap-2 sm:gap-4">
+          <div className="text-right">
+            <p className="text-sm font-medium">{user.name}</p>
+            <p className="text-xs text-muted-foreground">
+              {user.role === 'ADMIN' ? 'Administrador' : 'Operador'}
+            </p>
+          </div>
+          <LogoutButton />
         </div>
       </header>
       <section className="mx-auto max-w-6xl px-5 py-10 sm:px-8">

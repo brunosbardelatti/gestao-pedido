@@ -35,6 +35,12 @@ NEXT_PUBLIC_API_URL='http://localhost:3001' npm run dev:frontend
 
 O frontend fica disponível em `http://localhost:3000` e a API em `http://localhost:3001/api/v1`.
 
+## Autenticação disponível
+
+- `POST /api/v1/auth/login`: cria a sessão HTTP-only.
+- `GET /api/v1/auth/me`: retorna o usuário da sessão atual.
+- `POST /api/v1/auth/logout`: revoga a sessão atual e remove o cookie.
+
 ## Verificações
 
 ```bash

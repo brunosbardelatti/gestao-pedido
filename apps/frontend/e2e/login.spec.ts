@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('authenticates and opens the protected workspace', async ({ page }) => {
+test('authenticates, opens the workspace and ends the session', async ({ page }) => {
   await page.goto('/login');
 
   await expect(
@@ -19,4 +19,10 @@ test('authenticates and opens the protected workspace', async ({ page }) => {
   await expect(page).toHaveURL('/');
   await expect(page.getByRole('heading', { name: 'Operação' })).toBeVisible();
   await expect(page.getByText('Administrador', { exact: true }).first()).toBeVisible();
+
+  await page.getByRole('button', { name: 'Sair' }).click();
+
+  await expect(page).toHaveURL('/login');
+  await page.goto('/');
+  await expect(page).toHaveURL('/login');
 });
