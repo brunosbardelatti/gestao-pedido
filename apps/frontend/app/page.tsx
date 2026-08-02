@@ -7,6 +7,7 @@ import {
   Plus,
   ShoppingBag,
   ShoppingCart,
+  ReceiptText,
   Tags,
   UserPlus,
   Users,
@@ -84,7 +85,7 @@ export default async function HomePage(): Promise<React.JSX.Element> {
             <ShoppingBag aria-hidden />
             <div>
               <h2>Pedidos e vendas</h2>
-              <p>Os próximos fluxos serão adicionados por caso de uso.</p>
+              <p>Compras, clientes e vendas da operação.</p>
             </div>
             <div className="workspace-actions">
               <Link href="/customers" className="workspace-action">
@@ -102,6 +103,10 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               <Link href="/sales/new" className="workspace-action">
                 <ShoppingCart className="size-4" aria-hidden />
                 Registrar venda
+              </Link>
+              <Link href="/sales" className="workspace-action">
+                <ReceiptText className="size-4" aria-hidden />
+                Consultar vendas
               </Link>
               <Link href="/customers/new" className="workspace-action">
                 <UserPlus className="size-4" aria-hidden />

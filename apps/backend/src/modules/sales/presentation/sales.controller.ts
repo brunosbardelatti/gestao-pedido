@@ -8,6 +8,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
   Req,
   Res,
   ValidationPipe,
@@ -19,8 +20,10 @@ import { GetCurrentUserUseCase } from '../../auth/application/use-cases/get-curr
 import { CancelSaleUseCase } from '../application/use-cases/cancel-sale.use-case';
 import { CreateSaleUseCase } from '../application/use-cases/create-sale.use-case';
 import { DownloadSaleReceiptUseCase } from '../application/use-cases/download-sale-receipt.use-case';
+import { ListSalesUseCase } from '../application/use-cases/list-sales.use-case';
 import { CancelSaleDto } from './dto/cancel-sale.dto';
 import { CreateSaleDto } from './dto/create-sale.dto';
+import { ListSalesQueryDto } from './dto/list-sales-query.dto';
 
 const idempotencyKeyPipe = new ParseUUIDPipe({ version: '4' });
 
@@ -35,7 +38,28 @@ export class SalesController {
     private readonly createSaleUseCase: CreateSaleUseCase,
     @Inject(DownloadSaleReceiptUseCase)
     private readonly downloadSaleReceiptUseCase: DownloadSaleReceiptUseCase,
+    @Inject(ListSalesUseCase)
+    private readonly listSalesUseCase: ListSalesUseCase,
   ) {}
+
+  @Get()
+  async list(
+    @Query(
+      new ValidationPipe({
+        expectedType: ListSalesQueryDto,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    )
+    query: ListSalesQueryDto,
+    @Req() request: RequestWithId,
+  ) {
+    const cookies = request.cookies as Record<string, string | undefined>;
+    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    const result = await this.listSalesUseCase.execute(query);
+    return { data: result.items, meta: result.meta };
+  }
 
   @Get(':id/receipt')
   async downloadReceipt(
