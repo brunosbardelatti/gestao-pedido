@@ -20,6 +20,7 @@ import { CategoryAlreadyExistsError } from '../../modules/categories/domain/erro
 import { CategoryNotFoundError } from '../../modules/categories/domain/errors/category-not-found.error';
 import { InvalidCategoryNameError } from '../../modules/categories/domain/errors/invalid-category-name.error';
 import { CustomerCpfAlreadyExistsError } from '../../modules/customers/domain/errors/customer-cpf-already-exists.error';
+import { CustomerNotFoundError } from '../../modules/customers/domain/errors/customer-not-found.error';
 import { InvalidCustomerDataError } from '../../modules/customers/domain/errors/invalid-customer-data.error';
 import { InvalidInventoryAdjustmentError } from '../../modules/inventory/domain/errors/invalid-inventory-adjustment.error';
 import { InventoryIdempotencyKeyConflictError } from '../../modules/inventory/domain/errors/inventory-idempotency-key-conflict.error';
@@ -190,6 +191,14 @@ export class ApiExceptionFilter implements ExceptionFilter {
     if (exception instanceof CustomerCpfAlreadyExistsError) {
       return {
         status: HttpStatus.CONFLICT,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof CustomerNotFoundError) {
+      return {
+        status: HttpStatus.NOT_FOUND,
         code: exception.code,
         message: exception.message,
       };
