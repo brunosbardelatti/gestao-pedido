@@ -53,6 +53,15 @@ import { InvalidProductDescriptionError } from '../../modules/products/domain/er
 import { InvalidProductPriceError } from '../../modules/products/domain/errors/invalid-product-price.error';
 import { ProductAlreadyExistsError } from '../../modules/products/domain/errors/product-already-exists.error';
 import { ProductNotFoundError } from '../../modules/products/domain/errors/product-not-found.error';
+import { DuplicateSaleProductError } from '../../modules/sales/domain/errors/duplicate-sale-product.error';
+import { InvalidSaleItemError } from '../../modules/sales/domain/errors/invalid-sale-item.error';
+import { InvalidSalePaymentMethodError } from '../../modules/sales/domain/errors/invalid-sale-payment-method.error';
+import { SaleCustomerInactiveError } from '../../modules/sales/domain/errors/sale-customer-inactive.error';
+import { SaleCustomerNotFoundError } from '../../modules/sales/domain/errors/sale-customer-not-found.error';
+import { SaleIdempotencyKeyConflictError } from '../../modules/sales/domain/errors/sale-idempotency-key-conflict.error';
+import { SaleIdempotencyRequestInProgressError } from '../../modules/sales/domain/errors/sale-idempotency-request-in-progress.error';
+import { SaleProductInactiveError } from '../../modules/sales/domain/errors/sale-product-inactive.error';
+import { SaleProductNotFoundError } from '../../modules/sales/domain/errors/sale-product-not-found.error';
 import type { RequestWithId } from '../http/request-with-id';
 
 interface HttpExceptionBody {
@@ -255,6 +264,8 @@ export class ApiExceptionFilter implements ExceptionFilter {
       exception instanceof IdempotencyRequestInProgressError ||
       exception instanceof InventoryIdempotencyKeyConflictError ||
       exception instanceof InventoryIdempotencyRequestInProgressError
+      || exception instanceof SaleIdempotencyKeyConflictError
+      || exception instanceof SaleIdempotencyRequestInProgressError
     ) {
       return {
         status: HttpStatus.CONFLICT,
@@ -283,9 +294,25 @@ export class ApiExceptionFilter implements ExceptionFilter {
       exception instanceof OrderProductInactiveError ||
       exception instanceof OrderReceiptItemsMismatchError ||
       exception instanceof ReceivedQuantityExceededError
+      || exception instanceof DuplicateSaleProductError
+      || exception instanceof InvalidSaleItemError
+      || exception instanceof InvalidSalePaymentMethodError
+      || exception instanceof SaleCustomerInactiveError
+      || exception instanceof SaleProductInactiveError
     ) {
       return {
         status: HttpStatus.UNPROCESSABLE_ENTITY,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (
+      exception instanceof SaleCustomerNotFoundError ||
+      exception instanceof SaleProductNotFoundError
+    ) {
+      return {
+        status: HttpStatus.NOT_FOUND,
         code: exception.code,
         message: exception.message,
       };

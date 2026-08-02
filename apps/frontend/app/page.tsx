@@ -6,6 +6,7 @@ import {
   PackageSearch,
   Plus,
   ShoppingBag,
+  ShoppingCart,
   Tags,
   UserPlus,
   Users,
@@ -97,6 +98,10 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               <Link href="/orders/new" className="workspace-action">
                 <ClipboardPlus className="size-4" aria-hidden />
                 Criar pedido
+              </Link>
+              <Link href="/sales/new" className="workspace-action">
+                <ShoppingCart className="size-4" aria-hidden />
+                Registrar venda
               </Link>
               <Link href="/customers/new" className="workspace-action">
                 <UserPlus className="size-4" aria-hidden />

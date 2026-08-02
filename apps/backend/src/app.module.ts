@@ -9,6 +9,7 @@ import { HealthController } from './modules/health/health.controller';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { ProductsModule } from './modules/products/products.module';
+import { SalesModule } from './modules/sales/sales.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ProductsModule } from './modules/products/products.module';
     ProductsModule,
     OrdersModule,
     InventoryModule,
+    SalesModule,
   ],
   controllers: [HealthController],
 })
