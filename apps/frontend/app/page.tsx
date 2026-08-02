@@ -25,10 +25,16 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               <h2>Catálogo</h2>
               <p>Marcas, categorias e produtos.</p>
             </div>
-            <Link href="/brands/new" className="workspace-action">
-              <Plus className="size-4" aria-hidden />
-              Cadastrar marca
-            </Link>
+            <div className="workspace-actions">
+              <Link href="/brands/new" className="workspace-action">
+                <Plus className="size-4" aria-hidden />
+                Cadastrar marca
+              </Link>
+              <Link href="/categories/new" className="workspace-action">
+                <Plus className="size-4" aria-hidden />
+                Cadastrar categoria
+              </Link>
+            </div>
           </div>
           <div className="workspace-row">
             <Boxes aria-hidden />

@@ -173,6 +173,13 @@ input {
   transition: background-color 160ms ease;
 }
 
+.workspace-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
 .workspace-action:hover {
   background: var(--muted);
 }
@@ -224,9 +231,13 @@ input {
   }
 
   .workspace-row > span,
-  .workspace-action {
+  .workspace-actions {
     grid-column: 2;
     justify-self: start;
+  }
+
+  .workspace-actions {
+    justify-content: flex-start;
   }
 }
 

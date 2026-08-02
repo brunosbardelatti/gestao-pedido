@@ -3,10 +3,11 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from './infrastructure/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BrandsModule } from './modules/brands/brands.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 import { HealthController } from './modules/health/health.controller';
 
 @Module({
-  imports: [PrismaModule, AuthModule, BrandsModule],
+  imports: [PrismaModule, AuthModule, BrandsModule, CategoriesModule],
   controllers: [HealthController],
 })
 export class AppModule {}

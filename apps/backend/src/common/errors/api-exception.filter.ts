@@ -16,6 +16,8 @@ import { UserNotFoundError } from '../../modules/auth/domain/errors/user-not-fou
 import { BrandAlreadyExistsError } from '../../modules/brands/domain/errors/brand-already-exists.error';
 import { BrandNotFoundError } from '../../modules/brands/domain/errors/brand-not-found.error';
 import { InvalidBrandNameError } from '../../modules/brands/domain/errors/invalid-brand-name.error';
+import { CategoryAlreadyExistsError } from '../../modules/categories/domain/errors/category-already-exists.error';
+import { InvalidCategoryNameError } from '../../modules/categories/domain/errors/invalid-category-name.error';
 import type { RequestWithId } from '../http/request-with-id';
 
 interface HttpExceptionBody {
@@ -120,6 +122,22 @@ export class ApiExceptionFilter implements ExceptionFilter {
     }
 
     if (exception instanceof InvalidBrandNameError) {
+      return {
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof CategoryAlreadyExistsError) {
+      return {
+        status: HttpStatus.CONFLICT,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof InvalidCategoryNameError) {
       return {
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         code: exception.code,
