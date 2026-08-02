@@ -35,6 +35,19 @@ test('creates, updates and prevents a case-insensitive duplicate brand', async (
     `Marca ${updatedName} atualizada.`,
   );
 
+  await page.getByRole('button', { name: 'Inativar marca' }).click();
+  await expect(
+    page.getByRole('group', {
+      name: `Confirmar inativação de ${updatedName}`,
+    }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Confirmar inativação' }).click();
+  await expect(
+    page.getByRole('status').filter({
+      hasText: `Marca ${updatedName} inativada.`,
+    }),
+  ).toContainText(`Marca ${updatedName} inativada.`);
+
   await page.goto('/brands/new');
   await page.getByLabel('Nome da marca').fill(updatedName.toUpperCase());
   await page.getByRole('button', { name: 'Cadastrar marca' }).click();

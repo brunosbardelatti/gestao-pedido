@@ -77,7 +77,7 @@ describe('UpdateBrandForm', () => {
     );
     expect(screen.getByLabelText('Nome da marca')).toHaveValue('Natura Brasil');
     expect(replace).toHaveBeenCalledWith(
-      '/brands/brand-id/edit?name=Natura%20Brasil',
+      '/brands/brand-id/edit?name=Natura%20Brasil&active=true',
       { scroll: false },
     );
   });

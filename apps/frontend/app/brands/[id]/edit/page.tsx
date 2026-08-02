@@ -2,13 +2,17 @@ import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { DeactivateBrandButton } from '@/components/brands/deactivate-brand-button';
 import { UpdateBrandForm } from '@/components/brands/update-brand-form';
 import { AppHeader } from '@/components/layout/app-header';
 import { getCurrentUser } from '@/lib/auth';
 
 interface EditBrandPageProps {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ name?: string | string[] }>;
+  searchParams: Promise<{
+    name?: string | string[];
+    active?: string | string[];
+  }>;
 }
 
 export default async function EditBrandPage({
@@ -24,6 +28,7 @@ export default async function EditBrandPage({
   const { id } = await params;
   const query = await searchParams;
   const initialName = typeof query.name === 'string' ? query.name.slice(0, 100) : '';
+  const initialActive = query.active !== 'false';
 
   return (
     <main className="min-h-svh bg-background text-foreground">
@@ -39,7 +44,17 @@ export default async function EditBrandPage({
         <div className="mt-8">
           <p className="section-kicker">Catálogo</p>
           <h1 className="mt-2 text-2xl font-semibold">Editar marca</h1>
-          <UpdateBrandForm brandId={id} initialName={initialName} />
+          <UpdateBrandForm
+            key={`${id}-${initialActive}`}
+            brandId={id}
+            initialName={initialName}
+            initialActive={initialActive}
+          />
+          <DeactivateBrandButton
+            brandId={id}
+            brandName={initialName}
+            initialActive={initialActive}
+          />
         </div>
       </section>
     </main>

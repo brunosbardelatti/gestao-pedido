@@ -24,6 +24,7 @@ type UpdateBrandFields = z.infer<typeof updateBrandSchema>;
 interface UpdateBrandFormProps {
   brandId: string;
   initialName: string;
+  initialActive?: boolean;
 }
 
 interface ApiErrorEnvelope {
@@ -43,6 +44,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 export function UpdateBrandForm({
   brandId,
   initialName,
+  initialActive = true,
 }: UpdateBrandFormProps): React.JSX.Element {
   const router = useRouter();
   const [requestError, setRequestError] = useState<string | null>(null);
@@ -81,7 +83,7 @@ export function UpdateBrandForm({
       reset({ name: body.data.name });
       setSuccessMessage(`Marca ${body.data.name} atualizada.`);
       router.replace(
-        `/brands/${brandId}/edit?name=${encodeURIComponent(body.data.name)}`,
+        `/brands/${brandId}/edit?name=${encodeURIComponent(body.data.name)}&active=${initialActive}`,
         { scroll: false },
       );
     } catch {
