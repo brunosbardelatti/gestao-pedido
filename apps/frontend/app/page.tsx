@@ -1,4 +1,11 @@
-import { Boxes, PackageSearch, Plus, ShoppingBag, Tags } from 'lucide-react';
+import {
+  Boxes,
+  ClipboardPlus,
+  PackageSearch,
+  Plus,
+  ShoppingBag,
+  Tags,
+} from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -58,7 +65,12 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               <h2>Pedidos e vendas</h2>
               <p>Os próximos fluxos serão adicionados por caso de uso.</p>
             </div>
-            <span>Em breve</span>
+            <div className="workspace-actions">
+              <Link href="/orders/new" className="workspace-action">
+                <ClipboardPlus className="size-4" aria-hidden />
+                Criar pedido
+              </Link>
+            </div>
           </div>
         </div>
       </section>

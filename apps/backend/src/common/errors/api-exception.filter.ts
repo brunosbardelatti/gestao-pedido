@@ -19,6 +19,16 @@ import { InvalidBrandNameError } from '../../modules/brands/domain/errors/invali
 import { CategoryAlreadyExistsError } from '../../modules/categories/domain/errors/category-already-exists.error';
 import { CategoryNotFoundError } from '../../modules/categories/domain/errors/category-not-found.error';
 import { InvalidCategoryNameError } from '../../modules/categories/domain/errors/invalid-category-name.error';
+import { DuplicateOrderProductError } from '../../modules/orders/domain/errors/duplicate-order-product.error';
+import { IdempotencyKeyConflictError } from '../../modules/orders/domain/errors/idempotency-key-conflict.error';
+import { IdempotencyRequestInProgressError } from '../../modules/orders/domain/errors/idempotency-request-in-progress.error';
+import { InvalidOrderCycleError } from '../../modules/orders/domain/errors/invalid-order-cycle.error';
+import { InvalidOrderDateError } from '../../modules/orders/domain/errors/invalid-order-date.error';
+import { InvalidOrderItemError } from '../../modules/orders/domain/errors/invalid-order-item.error';
+import { InvalidOrderNotesError } from '../../modules/orders/domain/errors/invalid-order-notes.error';
+import { OrderBrandInactiveError } from '../../modules/orders/domain/errors/order-brand-inactive.error';
+import { OrderBrandMismatchError } from '../../modules/orders/domain/errors/order-brand-mismatch.error';
+import { OrderProductInactiveError } from '../../modules/orders/domain/errors/order-product-inactive.error';
 import { InactiveProductBrandError } from '../../modules/products/domain/errors/inactive-product-brand.error';
 import { InactiveProductCategoryError } from '../../modules/products/domain/errors/inactive-product-category.error';
 import { InvalidProductCodeError } from '../../modules/products/domain/errors/invalid-product-code.error';
@@ -183,6 +193,34 @@ export class ApiExceptionFilter implements ExceptionFilter {
       exception instanceof InvalidProductCodeError ||
       exception instanceof InvalidProductDescriptionError ||
       exception instanceof InvalidProductPriceError
+    ) {
+      return {
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (
+      exception instanceof IdempotencyKeyConflictError ||
+      exception instanceof IdempotencyRequestInProgressError
+    ) {
+      return {
+        status: HttpStatus.CONFLICT,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (
+      exception instanceof DuplicateOrderProductError ||
+      exception instanceof InvalidOrderCycleError ||
+      exception instanceof InvalidOrderDateError ||
+      exception instanceof InvalidOrderItemError ||
+      exception instanceof InvalidOrderNotesError ||
+      exception instanceof OrderBrandInactiveError ||
+      exception instanceof OrderBrandMismatchError ||
+      exception instanceof OrderProductInactiveError
     ) {
       return {
         status: HttpStatus.UNPROCESSABLE_ENTITY,
