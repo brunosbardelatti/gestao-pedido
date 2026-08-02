@@ -25,6 +25,7 @@ import { InvalidProductCodeError } from '../../modules/products/domain/errors/in
 import { InvalidProductDescriptionError } from '../../modules/products/domain/errors/invalid-product-description.error';
 import { InvalidProductPriceError } from '../../modules/products/domain/errors/invalid-product-price.error';
 import { ProductAlreadyExistsError } from '../../modules/products/domain/errors/product-already-exists.error';
+import { ProductNotFoundError } from '../../modules/products/domain/errors/product-not-found.error';
 import type { RequestWithId } from '../http/request-with-id';
 
 interface HttpExceptionBody {
@@ -163,6 +164,14 @@ export class ApiExceptionFilter implements ExceptionFilter {
     if (exception instanceof ProductAlreadyExistsError) {
       return {
         status: HttpStatus.CONFLICT,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof ProductNotFoundError) {
+      return {
+        status: HttpStatus.NOT_FOUND,
         code: exception.code,
         message: exception.message,
       };

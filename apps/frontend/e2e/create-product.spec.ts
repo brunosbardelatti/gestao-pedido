@@ -1,12 +1,11 @@
 import { expect, test } from '@playwright/test';
 
-test('creates a product with catalog references and rejects a duplicate', async ({
-  page,
-}) => {
+test('creates, updates and rejects a duplicate product', async ({ page }) => {
   const suffix = Date.now();
   const brandName = `Marca Produto E2E ${suffix}`;
   const categoryName = `Categoria Produto E2E ${suffix}`;
   const productCode = `PROD-${suffix}`;
+  const updatedProductCode = `${productCode}-EDIT`;
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/login');
@@ -50,7 +49,27 @@ test('creates a product with catalog references and rejects a duplicate', async 
     `Produto ${productCode} cadastrado.`,
   );
 
-  await page.getByLabel('Código do produto').fill(productCode.toLowerCase());
+  await page.getByRole('link', { name: 'Editar produto' }).click();
+  await expect(page).toHaveURL(/\/products\/[0-9a-f-]+\/edit$/);
+  await expect(page.getByLabel('Código do produto')).toHaveValue(productCode);
+  await page.getByLabel('Código do produto').fill(updatedProductCode);
+  await page.getByLabel('Descrição').fill('Produto E2E atualizado');
+  await page.getByLabel('Preço sugerido de venda (opcional)').fill('199,90');
+  await page.getByRole('button', { name: 'Salvar alterações' }).click();
+  await expect(page.getByRole('status')).toContainText(
+    `Produto ${updatedProductCode} atualizado.`,
+  );
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await page.goto('/products/new');
+  await page.getByLabel('Marca').selectOption({ label: brandName });
+  await page.getByLabel('Categoria').selectOption({ label: categoryName });
+  await page
+    .getByLabel('Código do produto')
+    .fill(updatedProductCode.toLowerCase());
   await page.getByLabel('Descrição').fill('Produto E2E duplicado');
   await page.getByLabel('Preço de catálogo').fill('149,90');
   await page.getByLabel('Preço de compra').fill('89,00');
