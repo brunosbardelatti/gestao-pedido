@@ -112,5 +112,6 @@ function sessionTtlMs(): number {
       ) => new ResetPasswordUseCase(passwords, persistence),
     },
   ],
+  exports: [GetCurrentUserUseCase],
 })
 export class AuthModule {}
