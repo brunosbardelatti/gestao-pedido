@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Req,
   ValidationPipe,
 } from '@nestjs/common';
@@ -19,6 +20,7 @@ import {
   CreateProductUseCase,
 } from '../application/use-cases/create-product.use-case';
 import { GetProductUseCase } from '../application/use-cases/get-product.use-case';
+import { ListProductsUseCase } from '../application/use-cases/list-products.use-case';
 import {
   type SetProductActiveOutput,
   SetProductActiveUseCase,
@@ -28,6 +30,7 @@ import {
   UpdateProductUseCase,
 } from '../application/use-cases/update-product.use-case';
 import { CreateProductDto } from './dto/create-product.dto';
+import { ListProductsQueryDto } from './dto/list-products-query.dto';
 import { SetProductActiveDto } from './dto/set-product-active.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
@@ -40,11 +43,33 @@ export class ProductsController {
     private readonly createProductUseCase: CreateProductUseCase,
     @Inject(GetProductUseCase)
     private readonly getProductUseCase: GetProductUseCase,
+    @Inject(ListProductsUseCase)
+    private readonly listProductsUseCase: ListProductsUseCase,
     @Inject(SetProductActiveUseCase)
     private readonly setProductActiveUseCase: SetProductActiveUseCase,
     @Inject(UpdateProductUseCase)
     private readonly updateProductUseCase: UpdateProductUseCase,
   ) {}
+
+  @Get()
+  async list(
+    @Query(
+      new ValidationPipe({
+        expectedType: ListProductsQueryDto,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    )
+    query: ListProductsQueryDto,
+    @Req() request: RequestWithId,
+  ) {
+    const cookies = request.cookies as Record<string, string | undefined>;
+    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    const result = await this.listProductsUseCase.execute(query);
+
+    return { data: result.items, meta: result.meta };
+  }
 
   @Get(':id')
   async getById(

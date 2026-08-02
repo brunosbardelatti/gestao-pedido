@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('creates, updates and rejects a duplicate product', async ({ page }) => {
+test('creates, updates, deactivates and lists a product', async ({ page }) => {
   const suffix = Date.now();
   const brandName = `Marca Produto E2E ${suffix}`;
   const categoryName = `Categoria Produto E2E ${suffix}`;
@@ -94,4 +94,24 @@ test('creates, updates and rejects a duplicate product', async ({ page }) => {
   ).toHaveText(
     'Já existe um produto com este código para a marca informada.',
   );
+
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Consultar produtos' }).click();
+  await expect(page).toHaveURL('/products');
+  await page.getByLabel('Código ou descrição').fill(updatedProductCode);
+  await page.getByLabel('Situação').selectOption('false');
+  await page.getByRole('button', { name: 'Filtrar' }).click();
+
+  await expect(page.getByText(updatedProductCode)).toBeVisible();
+  await expect(page.getByText('Produto E2E atualizado')).toBeVisible();
+  await expect(page.getByText('Inativo', { exact: true })).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await page
+    .getByRole('link', { name: `Editar produto ${updatedProductCode}` })
+    .click();
+  await expect(page).toHaveURL(/\/products\/[0-9a-f-]+\/edit$/);
 });

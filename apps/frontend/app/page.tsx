@@ -1,4 +1,4 @@
-import { Boxes, Plus, ShoppingBag, Tags } from 'lucide-react';
+import { Boxes, PackageSearch, Plus, ShoppingBag, Tags } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -26,6 +26,10 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               <p>Marcas, categorias e produtos.</p>
             </div>
             <div className="workspace-actions">
+              <Link href="/products" className="workspace-action">
+                <PackageSearch className="size-4" aria-hidden />
+                Consultar produtos
+              </Link>
               <Link href="/brands/new" className="workspace-action">
                 <Plus className="size-4" aria-hidden />
                 Cadastrar marca

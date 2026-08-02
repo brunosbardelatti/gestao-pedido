@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 export interface CatalogOption {
   id: string;
   name: string;
+  active?: boolean;
 }
 
 export interface ProductCatalogReferences {
@@ -26,6 +27,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 async function fetchCatalogOptions(
   resource: 'brands' | 'categories',
   cookieHeader: string,
+  activeOnly: boolean,
 ): Promise<CatalogOption[]> {
   async function fetchPage(page: number): Promise<CatalogListResponse> {
     const response = await fetch(
@@ -53,18 +55,21 @@ async function fetchCatalogOptions(
 
   return [firstPage, ...remainingPages]
     .flatMap((page) => page.data)
-    .filter((item) => item.active)
-    .map(({ id, name }) => ({ id, name }));
+    .filter((item) => !activeOnly || item.active)
+    .map(({ id, name, active }) => ({ id, name, active }));
 }
 
-export async function getProductCatalogReferences(): Promise<ProductCatalogReferences | null> {
+export async function getProductCatalogReferences(
+  options: { activeOnly?: boolean } = {},
+): Promise<ProductCatalogReferences | null> {
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.toString();
+  const activeOnly = options.activeOnly ?? true;
 
   try {
     const [brands, categories] = await Promise.all([
-      fetchCatalogOptions('brands', cookieHeader),
-      fetchCatalogOptions('categories', cookieHeader),
+      fetchCatalogOptions('brands', cookieHeader, activeOnly),
+      fetchCatalogOptions('categories', cookieHeader, activeOnly),
     ]);
 
     return { brands, categories };
