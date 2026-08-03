@@ -1,6 +1,6 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "npm ci && npm run build --workspace @gestao-pedidos/frontend"
+buildCommand = "npm run build --workspace @gestao-pedidos/frontend"
 
 [deploy]
 startCommand = "npm run start --workspace @gestao-pedidos/frontend"

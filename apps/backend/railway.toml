@@ -1,6 +1,6 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "npm ci && npx prisma generate --schema apps/backend/prisma/schema.prisma && npm run build --workspace @gestao-pedidos/backend"
+buildCommand = "npx prisma generate --schema apps/backend/prisma/schema.prisma && npm run build --workspace @gestao-pedidos/backend"
 
 [deploy]
 startCommand = "npx prisma migrate deploy --schema apps/backend/prisma/schema.prisma && npm run start --workspace @gestao-pedidos/backend"
