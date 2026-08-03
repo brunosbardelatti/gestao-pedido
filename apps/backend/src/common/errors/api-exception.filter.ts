@@ -65,6 +65,10 @@ import { SaleNotCancelableError } from '../../modules/sales/domain/errors/sale-n
 import { SaleNotFoundError } from '../../modules/sales/domain/errors/sale-not-found.error';
 import { SaleProductInactiveError } from '../../modules/sales/domain/errors/sale-product-inactive.error';
 import { SaleProductNotFoundError } from '../../modules/sales/domain/errors/sale-product-not-found.error';
+import { ApiKeyAlreadyRevokedError } from '../../modules/integrations/domain/errors/api-key-already-revoked.error';
+import { ApiKeyNotFoundError } from '../../modules/integrations/domain/errors/api-key-not-found.error';
+import { InvalidApiKeyError } from '../../modules/integrations/domain/errors/invalid-api-key.error';
+import { InvalidApiKeyNameError } from '../../modules/integrations/domain/errors/invalid-api-key-name.error';
 import type { RequestWithId } from '../http/request-with-id';
 
 interface HttpExceptionBody {
@@ -307,6 +311,38 @@ export class ApiExceptionFilter implements ExceptionFilter {
     ) {
       return {
         status: HttpStatus.UNPROCESSABLE_ENTITY,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof ApiKeyNotFoundError) {
+      return {
+        status: HttpStatus.NOT_FOUND,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof ApiKeyAlreadyRevokedError) {
+      return {
+        status: HttpStatus.CONFLICT,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof InvalidApiKeyNameError) {
+      return {
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof InvalidApiKeyError) {
+      return {
+        status: HttpStatus.UNAUTHORIZED,
         code: exception.code,
         message: exception.message,
       };

@@ -6,6 +6,7 @@ import { BrandsModule } from './modules/brands/brands.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { CustomersModule } from './modules/customers/customers.module';
 import { HealthController } from './modules/health/health.controller';
+import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { ProductsModule } from './modules/products/products.module';
@@ -19,6 +20,7 @@ import { SalesModule } from './modules/sales/sales.module';
     BrandsModule,
     CategoriesModule,
     CustomersModule,
+    IntegrationsModule,
     ProductsModule,
     OrdersModule,
     InventoryModule,
