@@ -1,6 +1,7 @@
 import {
   Boxes,
   ChartNoAxesCombined,
+  ChartColumn,
   ClipboardList,
   ClipboardPlus,
   History,
@@ -125,6 +126,10 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               <Link href="/reports/inventory" className="workspace-action">
                 <Boxes className="size-4" aria-hidden />
                 Posição de estoque
+              </Link>
+              <Link href="/reports/sales" className="workspace-action">
+                <ChartColumn className="size-4" aria-hidden />
+                Vendas por período
               </Link>
             </div>
           </div>

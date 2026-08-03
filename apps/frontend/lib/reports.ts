@@ -36,9 +36,27 @@ export interface InventoryReportResult {
   meta: ReportPaginationMeta;
 }
 
+export interface SalesReportQuery {
+  startDate: string;
+  endDate: string;
+  includeCanceled?: boolean;
+}
+
+export interface SalesReport {
+  startDate: string;
+  endDate: string;
+  salesCount: number;
+  itemsCount: number;
+  revenue: string;
+}
+
 interface InventoryReportResponse {
   data: InventoryReportItem[];
   meta: ReportPaginationMeta;
+}
+
+interface SalesReportResponse {
+  data: SalesReport;
 }
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
@@ -66,6 +84,33 @@ export async function getInventoryReport(
 
     const body = (await response.json()) as InventoryReportResponse;
     return { items: body.data, meta: body.meta };
+  } catch {
+    return null;
+  }
+}
+
+export async function getSalesReport(
+  query: SalesReportQuery,
+): Promise<SalesReport | null> {
+  const cookieStore = await cookies();
+  const searchParams = new URLSearchParams({
+    startDate: query.startDate,
+    endDate: query.endDate,
+  });
+  if (query.includeCanceled) searchParams.set('includeCanceled', 'true');
+
+  try {
+    const response = await fetch(
+      `${apiUrl}/api/v1/reports/sales?${searchParams.toString()}`,
+      {
+        headers: { Cookie: cookieStore.toString() },
+        cache: 'no-store',
+      },
+    );
+    if (!response.ok) return null;
+
+    const body = (await response.json()) as SalesReportResponse;
+    return body.data;
   } catch {
     return null;
   }
