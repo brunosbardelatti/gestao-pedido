@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers';
+﻿import { cookies } from 'next/headers';
 
 import type { CatalogOption } from './catalog';
 import { getProductCatalogReferences } from './catalog';
@@ -75,7 +75,7 @@ interface OrderListResponse {
   meta: OrderListMeta;
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const apiUrl = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export async function getOrder(orderId: string): Promise<OrderDetails | null> {
   const cookieStore = await cookies();
@@ -148,3 +148,4 @@ export async function getOrderCatalog(): Promise<OrderCatalog | null> {
     ],
   };
 }
+

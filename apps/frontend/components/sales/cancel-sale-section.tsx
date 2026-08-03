@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useRef, useState } from 'react';
 import {
@@ -22,7 +22,7 @@ interface ApiErrorEnvelope {
   error?: { message?: string };
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const apiUrl = '';
 const currency = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
@@ -59,13 +59,13 @@ export function CancelSaleSection({
       });
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as ApiErrorEnvelope;
-        setRequestError(body.error?.message ?? 'Não foi possível cancelar a venda.');
+        setRequestError(body.error?.message ?? 'NÃ£o foi possÃ­vel cancelar a venda.');
         return;
       }
       setCanceled(true);
       setIsConfirming(false);
     } catch {
-      setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
+      setRequestError('NÃ£o foi possÃ­vel conectar ao servidor. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }
@@ -92,8 +92,8 @@ export function CancelSaleSection({
     <div className="mt-6 border-t border-border pt-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold">Situação da venda</p>
-          <p className="mt-1 text-sm text-muted-foreground">Concluída</p>
+          <p className="text-sm font-semibold">SituaÃ§Ã£o da venda</p>
+          <p className="mt-1 text-sm text-muted-foreground">ConcluÃ­da</p>
         </div>
         {!isConfirming ? (
           <Button
@@ -122,7 +122,7 @@ export function CancelSaleSection({
               aria-hidden
             />
             <span>
-              A venda será cancelada e todos os itens retornarão ao estoque.
+              A venda serÃ¡ cancelada e todos os itens retornarÃ£o ao estoque.
             </span>
           </p>
           <div className="mt-4 max-w-2xl space-y-2">
@@ -186,3 +186,4 @@ export function CancelSaleSection({
     </div>
   );
 }
+

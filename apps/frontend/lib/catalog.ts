@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers';
+﻿import { cookies } from 'next/headers';
 
 export interface CatalogOption {
   id: string;
@@ -22,7 +22,7 @@ interface CatalogListResponse {
   };
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const apiUrl = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 async function fetchCatalogOptions(
   resource: 'brands' | 'categories',
@@ -77,3 +77,4 @@ export async function getProductCatalogReferences(
     return null;
   }
 }
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import {
@@ -30,7 +30,7 @@ interface SetProductActiveResponse {
   };
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const apiUrl = '';
 
 export function DeactivateProductButton({
   productId,
@@ -61,7 +61,7 @@ export function DeactivateProductButton({
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as ApiErrorEnvelope;
         setRequestError(
-          body.error?.message ?? 'Não foi possível inativar o produto.',
+          body.error?.message ?? 'NÃ£o foi possÃ­vel inativar o produto.',
         );
         setIsConfirming(false);
         return;
@@ -72,7 +72,7 @@ export function DeactivateProductButton({
       setConfirmedCode(body.data.code);
       setIsConfirming(false);
     } catch {
-      setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
+      setRequestError('NÃ£o foi possÃ­vel conectar ao servidor. Tente novamente.');
       setIsConfirming(false);
     } finally {
       setIsSubmitting(false);
@@ -82,7 +82,7 @@ export function DeactivateProductButton({
   if (!active) {
     return (
       <div className="mt-10 max-w-3xl border-t border-border pt-7">
-        <p className="text-sm font-semibold">Situação do produto</p>
+        <p className="text-sm font-semibold">SituaÃ§Ã£o do produto</p>
         <div
           role="status"
           className="mt-3 flex items-start gap-2 border-l-2 border-ring bg-muted px-3 py-2.5 text-sm text-foreground"
@@ -98,7 +98,7 @@ export function DeactivateProductButton({
     <div className="mt-10 max-w-3xl border-t border-border pt-7">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold">Situação do produto</p>
+          <p className="text-sm font-semibold">SituaÃ§Ã£o do produto</p>
           <p className="mt-1 text-sm text-muted-foreground">Ativo</p>
         </div>
         {!isConfirming ? (
@@ -116,7 +116,7 @@ export function DeactivateProductButton({
       {isConfirming ? (
         <div
           role="group"
-          aria-label={`Confirmar inativação de ${productCode}`}
+          aria-label={`Confirmar inativaÃ§Ã£o de ${productCode}`}
           className="mt-5 border-l-2 border-destructive bg-destructive/5 px-3 py-3"
         >
           <p className="flex items-start gap-2 text-sm text-foreground">
@@ -124,7 +124,7 @@ export function DeactivateProductButton({
               className="mt-0.5 size-4 shrink-0 text-destructive"
               aria-hidden
             />
-            <span>Confirmar inativação de {productCode}?</span>
+            <span>Confirmar inativaÃ§Ã£o de {productCode}?</span>
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button
@@ -149,7 +149,7 @@ export function DeactivateProductButton({
               ) : (
                 <>
                   <CircleOff className="size-4" aria-hidden />
-                  Confirmar inativação
+                  Confirmar inativaÃ§Ã£o
                 </>
               )}
             </Button>
@@ -169,3 +169,4 @@ export function DeactivateProductButton({
     </div>
   );
 }
+

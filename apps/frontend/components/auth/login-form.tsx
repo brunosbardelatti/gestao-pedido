@@ -27,8 +27,6 @@ interface ApiErrorEnvelope {
   };
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
-
 export function LoginForm(): React.JSX.Element {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -46,7 +44,7 @@ export function LoginForm(): React.JSX.Element {
     setRequestError(null);
 
     try {
-      const response = await fetch(`${apiUrl}/api/v1/auth/login`, {
+      const response = await fetch('/api/v1/auth/login', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

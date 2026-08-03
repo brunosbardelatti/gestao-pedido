@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers';
+﻿import { cookies } from 'next/headers';
 
 export interface CurrentUser {
   id: string;
@@ -10,7 +10,7 @@ export interface CurrentUser {
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const cookieStore = await cookies();
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+  const apiUrl = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
   try {
     const response = await fetch(`${apiUrl}/api/v1/auth/me`, {
@@ -28,3 +28,4 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     return null;
   }
 }
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -27,17 +27,17 @@ const adjustmentSchema = z.object({
   productId: z
     .string()
     .min(1, 'Selecione o produto.')
-    .regex(uuidPattern, 'Selecione um produto válido.'),
+    .regex(uuidPattern, 'Selecione um produto vÃ¡lido.'),
   type: z.enum(['CORRECTION', 'PERSONAL_USE', 'RETURN']),
   quantityDelta: z
     .number({ error: 'Informe a quantidade.' })
     .int('A quantidade deve ser inteira.')
-    .refine((value) => value !== 0, 'A quantidade não pode ser zero.'),
+    .refine((value) => value !== 0, 'A quantidade nÃ£o pode ser zero.'),
   reason: z
     .string()
     .trim()
     .min(1, 'Informe o motivo.')
-    .max(500, 'Use no máximo 500 caracteres.'),
+    .max(500, 'Use no mÃ¡ximo 500 caracteres.'),
   confirmNegativeStock: z.boolean(),
 });
 
@@ -52,7 +52,7 @@ interface ApiErrorEnvelope {
   error?: { message?: string };
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const apiUrl = '';
 
 export function AdjustStockForm({
   products,
@@ -122,7 +122,7 @@ export function AdjustStockForm({
       if (!response.ok) {
         const error = (await response.json()) as ApiErrorEnvelope;
         setRequestError(
-          error.error?.message ?? 'Não foi possível registrar o ajuste.',
+          error.error?.message ?? 'NÃ£o foi possÃ­vel registrar o ajuste.',
         );
         return;
       }
@@ -140,7 +140,7 @@ export function AdjustStockForm({
         confirmNegativeStock: false,
       });
     } catch {
-      setRequestError('Não foi possível conectar ao serviço de estoque.');
+      setRequestError('NÃ£o foi possÃ­vel conectar ao serviÃ§o de estoque.');
     }
   }
 
@@ -160,7 +160,7 @@ export function AdjustStockForm({
             <option value="">Selecione</option>
             {products.map((product) => (
               <option key={product.id} value={product.id}>
-                {product.code} · {product.description}
+                {product.code} Â· {product.description}
               </option>
             ))}
           </NativeSelect>
@@ -176,9 +176,9 @@ export function AdjustStockForm({
             disabled={isSubmitting}
             {...register('type')}
           >
-            <option value="CORRECTION">Correção</option>
+            <option value="CORRECTION">CorreÃ§Ã£o</option>
             <option value="PERSONAL_USE">Uso pessoal</option>
-            <option value="RETURN">Devolução</option>
+            <option value="RETURN">DevoluÃ§Ã£o</option>
           </NativeSelect>
         </div>
 
@@ -236,7 +236,7 @@ export function AdjustStockForm({
         <div className="border-l-2 border-destructive bg-destructive/5 px-4 py-3 text-sm">
           <p className="flex items-center gap-2 font-semibold text-destructive">
             <TriangleAlert className="size-4" aria-hidden />
-            Este ajuste deixará o estoque negativo.
+            Este ajuste deixarÃ¡ o estoque negativo.
           </p>
           <label className="mt-3 flex cursor-pointer items-start gap-2 font-medium">
             <input
@@ -289,9 +289,10 @@ export function AdjustStockForm({
           href="/inventory/movements"
           className={buttonVariants({ variant: 'ghost' })}
         >
-          Ver movimentações
+          Ver movimentaÃ§Ãµes
         </Link>
       </div>
     </form>
   );
 }
+

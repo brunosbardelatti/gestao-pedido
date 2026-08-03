@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers';
+﻿import { cookies } from 'next/headers';
 
 interface ProductReference {
   id: string;
@@ -51,7 +51,7 @@ interface ProductListResponse {
   meta: ProductListMeta;
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const apiUrl = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export async function getProduct(productId: string): Promise<ProductDetails | null> {
   const cookieStore = await cookies();
@@ -102,3 +102,4 @@ export async function listProducts(
     return null;
   }
 }
+

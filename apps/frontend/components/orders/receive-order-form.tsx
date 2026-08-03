@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,17 +37,17 @@ const receiveOrderSchema = z.object({
           quantityReceived: z
             .number({ error: 'Informe a quantidade recebida.' })
             .int('A quantidade deve ser inteira.')
-            .min(0, 'A quantidade não pode ser negativa.'),
+            .min(0, 'A quantidade nÃ£o pode ser negativa.'),
           expirationDate: z
             .string()
-            .refine(validOptionalDate, 'Informe uma data de validade válida.'),
-          notes: z.string().trim().max(500, 'Use no máximo 500 caracteres.'),
+            .refine(validOptionalDate, 'Informe uma data de validade vÃ¡lida.'),
+          notes: z.string().trim().max(500, 'Use no mÃ¡ximo 500 caracteres.'),
         })
         .superRefine((item, context) => {
           if (item.quantityReceived > item.quantityOrdered) {
             context.addIssue({
               code: 'custom',
-              message: `A quantidade máxima para este item é ${item.quantityOrdered}.`,
+              message: `A quantidade mÃ¡xima para este item Ã© ${item.quantityOrdered}.`,
               path: ['quantityReceived'],
             });
           }
@@ -70,7 +70,7 @@ interface ReceiveOrderResponse {
   data: { id: string; cycle: string };
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const apiUrl = '';
 
 export function ReceiveOrderForm({
   order,
@@ -138,7 +138,7 @@ export function ReceiveOrderForm({
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as ApiErrorEnvelope;
         setRequestError(
-          body.error?.message ?? 'Não foi possível receber o pedido.',
+          body.error?.message ?? 'NÃ£o foi possÃ­vel receber o pedido.',
         );
         return;
       }
@@ -147,7 +147,7 @@ export function ReceiveOrderForm({
       setAttempt(null);
       setReceivedCycle(body.data.cycle);
     } catch {
-      setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
+      setRequestError('NÃ£o foi possÃ­vel conectar ao servidor. Tente novamente.');
     }
   }
 
@@ -161,7 +161,7 @@ export function ReceiveOrderForm({
         <div>
           <p className="text-sm font-semibold">{order.brand.name}</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Ciclo {order.cycle} · {order.items.length}{' '}
+            Ciclo {order.cycle} Â· {order.items.length}{' '}
             {order.items.length === 1 ? 'item' : 'itens'}
           </p>
         </div>
@@ -241,12 +241,12 @@ export function ReceiveOrderForm({
               </div>
               <div className="mt-5 space-y-2">
                 <Label htmlFor={`receipt-item-${index}-notes`}>
-                  Observações
+                  ObservaÃ§Ãµes
                 </Label>
                 <Input
                   id={`receipt-item-${index}-notes`}
                   maxLength={500}
-                  aria-label={`Observações de ${item.productCode}`}
+                  aria-label={`ObservaÃ§Ãµes de ${item.productCode}`}
                   aria-invalid={Boolean(itemErrors?.notes)}
                   {...register(`items.${index}.notes`)}
                 />
@@ -300,3 +300,4 @@ export function ReceiveOrderForm({
     </form>
   );
 }
+

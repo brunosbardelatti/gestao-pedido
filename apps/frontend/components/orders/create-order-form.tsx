@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -30,7 +30,7 @@ const orderItemSchema = z.object({
   productId: z
     .string()
     .min(1, 'Selecione o produto.')
-    .regex(uuidPattern, 'Selecione um produto válido.'),
+    .regex(uuidPattern, 'Selecione um produto vÃ¡lido.'),
   quantityOrdered: z
     .number({ error: 'Informe a quantidade.' })
     .int('A quantidade deve ser inteira.')
@@ -38,16 +38,16 @@ const orderItemSchema = z.object({
   catalogUnitPrice: z
     .string()
     .trim()
-    .regex(moneyPattern, 'Informe o preço de catálogo.'),
+    .regex(moneyPattern, 'Informe o preÃ§o de catÃ¡logo.'),
   purchaseUnitPrice: z
     .string()
     .trim()
-    .regex(moneyPattern, 'Informe o preço de compra.'),
+    .regex(moneyPattern, 'Informe o preÃ§o de compra.'),
   originalUnitPrice: z
     .string()
     .trim()
-    .regex(moneyPattern, 'Informe o preço original.'),
-  notes: z.string().trim().max(500, 'Use no máximo 500 caracteres.'),
+    .regex(moneyPattern, 'Informe o preÃ§o original.'),
+  notes: z.string().trim().max(500, 'Use no mÃ¡ximo 500 caracteres.'),
 });
 
 const createOrderSchema = z
@@ -55,12 +55,12 @@ const createOrderSchema = z
     brandId: z
       .string()
       .min(1, 'Selecione a marca.')
-      .regex(uuidPattern, 'Selecione uma marca válida.'),
+      .regex(uuidPattern, 'Selecione uma marca vÃ¡lida.'),
     cycle: z
       .string()
       .trim()
       .min(1, 'Informe o ciclo.')
-      .max(80, 'O ciclo deve ter no máximo 80 caracteres.'),
+      .max(80, 'O ciclo deve ter no mÃ¡ximo 80 caracteres.'),
     orderDate: z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, 'Informe a data do pedido.'),
@@ -127,7 +127,7 @@ interface CreateOrderResponse {
   };
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const apiUrl = '';
 
 function emptyItem(): CreateOrderFields['items'][number] {
   return {
@@ -255,8 +255,8 @@ export function OrderForm({
         setRequestError(
           body.error?.message ??
             (isUpdate
-              ? 'Não foi possível atualizar o pedido.'
-              : 'Não foi possível criar o pedido.'),
+              ? 'NÃ£o foi possÃ­vel atualizar o pedido.'
+              : 'NÃ£o foi possÃ­vel criar o pedido.'),
         );
         return;
       }
@@ -279,7 +279,7 @@ export function OrderForm({
         reset(initialValues);
       }
     } catch {
-      setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
+      setRequestError('NÃ£o foi possÃ­vel conectar ao servidor. Tente novamente.');
     }
   }
 
@@ -351,7 +351,7 @@ export function OrderForm({
           ) : null}
         </div>
         <div className="space-y-2 sm:col-span-2 lg:col-span-3">
-          <Label htmlFor="order-notes">Observações do pedido</Label>
+          <Label htmlFor="order-notes">ObservaÃ§Ãµes do pedido</Label>
           <Input id="order-notes" maxLength={1000} {...register('notes')} />
         </div>
       </div>
@@ -362,7 +362,7 @@ export function OrderForm({
             <p className="text-sm font-semibold">Itens do pedido</p>
             <p className="mt-1 text-sm text-muted-foreground">
               {brandId
-                ? `${availableProducts.length} produtos disponíveis para a marca.`
+                ? `${availableProducts.length} produtos disponÃ­veis para a marca.`
                 : 'Selecione a marca para escolher os produtos.'}
             </p>
           </div>
@@ -409,7 +409,7 @@ export function OrderForm({
                       <option value="">Selecione</option>
                       {availableProducts.map((product) => (
                         <option key={product.id} value={product.id}>
-                          {product.code} · {product.description}
+                          {product.code} Â· {product.description}
                         </option>
                       ))}
                     </NativeSelect>
@@ -444,9 +444,9 @@ export function OrderForm({
 
                 <div className="mt-5 grid gap-5 sm:grid-cols-3">
                   {[
-                    ['catalogUnitPrice', 'Preço de catálogo'],
-                    ['purchaseUnitPrice', 'Preço de compra'],
-                    ['originalUnitPrice', 'Preço original'],
+                    ['catalogUnitPrice', 'PreÃ§o de catÃ¡logo'],
+                    ['purchaseUnitPrice', 'PreÃ§o de compra'],
+                    ['originalUnitPrice', 'PreÃ§o original'],
                   ].map(([fieldName, label]) => {
                     const name = fieldName as
                       | 'catalogUnitPrice'
@@ -477,7 +477,7 @@ export function OrderForm({
                 </div>
                 <div className="mt-5 space-y-2">
                   <Label htmlFor={`order-item-${index}-notes`}>
-                    Observações do item
+                    ObservaÃ§Ãµes do item
                   </Label>
                   <Input
                     id={`order-item-${index}-notes`}
@@ -532,7 +532,7 @@ export function OrderForm({
         {isSubmitting ? (
           <>
             <LoaderCircle className="size-4 animate-spin" aria-hidden />
-            {isUpdate ? 'Salvando alterações' : 'Criando pedido'}
+            {isUpdate ? 'Salvando alteraÃ§Ãµes' : 'Criando pedido'}
           </>
         ) : (
           <>
@@ -541,7 +541,7 @@ export function OrderForm({
             ) : (
               <ClipboardPlus className="size-4" aria-hidden />
             )}
-            {isUpdate ? 'Salvar alterações' : 'Criar pedido'}
+            {isUpdate ? 'Salvar alteraÃ§Ãµes' : 'Criar pedido'}
           </>
         )}
       </Button>
@@ -567,3 +567,4 @@ export function CreateOrderForm({
     />
   );
 }
+

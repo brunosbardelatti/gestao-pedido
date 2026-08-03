@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import {
@@ -26,7 +26,7 @@ interface CancelOrderResponse {
   data: { cycle: string; status: 'CANCELED' };
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const apiUrl = '';
 
 export function CancelOrderSection({
   orderId,
@@ -57,7 +57,7 @@ export function CancelOrderSection({
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as ApiErrorEnvelope;
         setRequestError(
-          body.error?.message ?? 'Não foi possível cancelar o pedido.',
+          body.error?.message ?? 'NÃ£o foi possÃ­vel cancelar o pedido.',
         );
         return;
       }
@@ -66,7 +66,7 @@ export function CancelOrderSection({
       setCanceledCycle(body.data.cycle);
       setIsConfirming(false);
     } catch {
-      setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
+      setRequestError('NÃ£o foi possÃ­vel conectar ao servidor. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }
@@ -90,7 +90,7 @@ export function CancelOrderSection({
     <div className="mt-8 max-w-5xl border-t border-border pt-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold">Situação do pedido</p>
+          <p className="text-sm font-semibold">SituaÃ§Ã£o do pedido</p>
           <p className="mt-1 text-sm text-muted-foreground">Em aberto</p>
         </div>
         {!isConfirming ? (
@@ -119,7 +119,7 @@ export function CancelOrderSection({
               className="mt-0.5 size-4 shrink-0 text-destructive"
               aria-hidden
             />
-            <span>O pedido do ciclo {cycle} será cancelado.</span>
+            <span>O pedido do ciclo {cycle} serÃ¡ cancelado.</span>
           </p>
           <div className="mt-4 max-w-2xl space-y-2">
             <Label htmlFor="order-cancel-reason">Motivo do cancelamento</Label>
@@ -177,3 +177,4 @@ export function CancelOrderSection({
     </div>
   );
 }
+

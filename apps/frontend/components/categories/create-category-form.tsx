@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,7 +22,7 @@ const createCategorySchema = z.object({
     .string()
     .trim()
     .min(1, 'Informe o nome da categoria.')
-    .max(100, 'O nome deve ter no máximo 100 caracteres.'),
+    .max(100, 'O nome deve ter no mÃ¡ximo 100 caracteres.'),
 });
 
 type CreateCategoryFields = z.infer<typeof createCategorySchema>;
@@ -45,7 +45,7 @@ interface CreatedCategory {
   name: string;
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const apiUrl = '';
 
 export function CreateCategoryForm(): React.JSX.Element {
   const [requestError, setRequestError] = useState<string | null>(null);
@@ -77,7 +77,7 @@ export function CreateCategoryForm(): React.JSX.Element {
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as ApiErrorEnvelope;
         setRequestError(
-          body.error?.message ?? 'Não foi possível cadastrar a categoria.',
+          body.error?.message ?? 'NÃ£o foi possÃ­vel cadastrar a categoria.',
         );
         return;
       }
@@ -87,7 +87,7 @@ export function CreateCategoryForm(): React.JSX.Element {
       setCreatedCategory({ id: body.data.id, name: body.data.name });
       setFocus('name');
     } catch {
-      setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
+      setRequestError('NÃ£o foi possÃ­vel conectar ao servidor. Tente novamente.');
     }
   }
 
@@ -161,3 +161,4 @@ export function CreateCategoryForm(): React.JSX.Element {
     </form>
   );
 }
+

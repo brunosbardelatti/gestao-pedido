@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers';
+﻿import { cookies } from 'next/headers';
 
 export interface CustomerDetails {
   id: string;
@@ -43,7 +43,7 @@ interface CustomerListResponse {
   meta: CustomerListMeta;
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const apiUrl = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export async function getCustomer(
   customerId: string,
@@ -88,3 +88,4 @@ export async function listCustomers(
     return null;
   }
 }
+

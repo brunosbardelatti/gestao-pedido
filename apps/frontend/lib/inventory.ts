@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers';
+﻿import { cookies } from 'next/headers';
 
 import { listProducts } from './products';
 
@@ -92,7 +92,7 @@ interface InventoryMovementResponse {
   meta: InventoryMeta;
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const apiUrl = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export async function getCurrentStock(
   query: InventoryQuery,
@@ -207,3 +207,4 @@ export async function getInventoryAdjustmentProducts(): Promise<
     balance: balances.get(product.id) ?? 0,
   }));
 }
+

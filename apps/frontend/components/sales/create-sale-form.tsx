@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -41,7 +41,7 @@ const saleSchema = z
           productId: z
             .string()
             .min(1, 'Selecione o produto.')
-            .regex(uuidPattern, 'Selecione um produto válido.'),
+            .regex(uuidPattern, 'Selecione um produto vÃ¡lido.'),
           quantity: z
             .number({ error: 'Informe a quantidade.' })
             .int('A quantidade deve ser inteira.')
@@ -49,7 +49,7 @@ const saleSchema = z
           unitPrice: z
             .string()
             .trim()
-            .regex(moneyPattern, 'Informe um preço válido.'),
+            .regex(moneyPattern, 'Informe um preÃ§o vÃ¡lido.'),
         }),
       )
       .min(1, 'Adicione ao menos um item.'),
@@ -84,7 +84,7 @@ interface SaleResponse {
   data: { id: string; total: string };
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const apiUrl = '';
 
 function emptyItem(): SaleFields['items'][number] {
   return { productId: '', quantity: 1, unitPrice: '' };
@@ -196,7 +196,7 @@ export function CreateSaleForm({
       });
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as ApiErrorEnvelope;
-        setRequestError(body.error?.message ?? 'Não foi possível registrar a venda.');
+        setRequestError(body.error?.message ?? 'NÃ£o foi possÃ­vel registrar a venda.');
         return;
       }
       const body = (await response.json()) as SaleResponse;
@@ -204,7 +204,7 @@ export function CreateSaleForm({
       setSuccess({ id: body.data.id, total: body.data.total });
       reset(initialValues());
     } catch {
-      setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
+      setRequestError('NÃ£o foi possÃ­vel conectar ao servidor. Tente novamente.');
     }
   }
 
@@ -233,17 +233,17 @@ export function CreateSaleForm({
         <div className="space-y-2">
           <Label htmlFor="sale-payment">Forma de pagamento</Label>
           <NativeSelect id="sale-payment" {...register('paymentMethod')}>
-            <option value="">Não informada</option>
+            <option value="">NÃ£o informada</option>
             <option value="CASH">Dinheiro</option>
             <option value="PIX">Pix</option>
-            <option value="DEBIT_CARD">Cartão de débito</option>
-            <option value="CREDIT_CARD">Cartão de crédito</option>
-            <option value="BANK_TRANSFER">Transferência</option>
+            <option value="DEBIT_CARD">CartÃ£o de dÃ©bito</option>
+            <option value="CREDIT_CARD">CartÃ£o de crÃ©dito</option>
+            <option value="BANK_TRANSFER">TransferÃªncia</option>
             <option value="OTHER">Outra</option>
           </NativeSelect>
         </div>
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="sale-notes">Observações</Label>
+          <Label htmlFor="sale-notes">ObservaÃ§Ãµes</Label>
           <Textarea id="sale-notes" rows={3} {...register('notes')} />
         </div>
       </div>
@@ -290,7 +290,7 @@ export function CreateSaleForm({
                       <option value="">Selecione</option>
                       {products.map((product) => (
                         <option key={product.id} value={product.id}>
-                          {product.code} · {product.description}
+                          {product.code} Â· {product.description}
                         </option>
                       ))}
                     </NativeSelect>
@@ -318,10 +318,10 @@ export function CreateSaleForm({
                     ) : null}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor={`sale-item-${index}-price`}>Preço unitário</Label>
+                    <Label htmlFor={`sale-item-${index}-price`}>PreÃ§o unitÃ¡rio</Label>
                     <Input
                       id={`sale-item-${index}-price`}
-                      aria-label={`Preço unitário do item ${index + 1}`}
+                      aria-label={`PreÃ§o unitÃ¡rio do item ${index + 1}`}
                       inputMode="decimal"
                       {...register(`items.${index}.unitPrice`)}
                     />
@@ -346,7 +346,7 @@ export function CreateSaleForm({
           <div className="flex items-start gap-2">
             <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
             <span>
-              A venda deixará {shortages} {shortages === 1 ? 'unidade' : 'unidades'} abaixo de zero.
+              A venda deixarÃ¡ {shortages} {shortages === 1 ? 'unidade' : 'unidades'} abaixo de zero.
             </span>
           </div>
           <label className="mt-3 flex min-h-10 cursor-pointer items-center gap-2 text-foreground">
@@ -392,3 +392,4 @@ export function CreateSaleForm({
     </form>
   );
 }
+

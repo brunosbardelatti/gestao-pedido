@@ -6,8 +6,6 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
-
 export function LogoutButton(): React.JSX.Element {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,7 +16,7 @@ export function LogoutButton(): React.JSX.Element {
     setRequestError(null);
 
     try {
-      const response = await fetch(`${apiUrl}/api/v1/auth/logout`, {
+      const response = await fetch('/api/v1/auth/logout', {
         method: 'POST',
         credentials: 'include',
       });
