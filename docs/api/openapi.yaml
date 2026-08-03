@@ -1733,6 +1733,28 @@ paths:
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/PageSize'
       - $ref: '#/components/parameters/Search'
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - description
+          - brandName
+          - balance
+          - suggestedSalePrice
+          default: description
+        description: Campo usado para ordenar o relatório.
+      - name: sortOrder
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - asc
+          - desc
+          default: asc
+        description: Direção da ordenação.
       responses:
         '200':
           description: Relatório de estoque.

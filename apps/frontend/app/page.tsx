@@ -1,5 +1,6 @@
 import {
   Boxes,
+  ChartNoAxesCombined,
   ClipboardList,
   ClipboardPlus,
   History,
@@ -111,6 +112,19 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               <Link href="/customers/new" className="workspace-action">
                 <UserPlus className="size-4" aria-hidden />
                 Cadastrar cliente
+              </Link>
+            </div>
+          </div>
+          <div className="workspace-row">
+            <ChartNoAxesCombined aria-hidden />
+            <div>
+              <h2>Relatórios</h2>
+              <p>Indicadores para acompanhamento da operação.</p>
+            </div>
+            <div className="workspace-actions">
+              <Link href="/reports/inventory" className="workspace-action">
+                <Boxes className="size-4" aria-hidden />
+                Posição de estoque
               </Link>
             </div>
           </div>
