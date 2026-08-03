@@ -26,6 +26,14 @@ Calcular margem usando snapshots de custo e venda.
 - Documentar a estratégia de associação de custo quando houver múltiplas compras do mesmo produto.
 - No MVP, permitir margem simples baseada no custo de referência definido pela aplicação.
 
+### Estratégia de custo do MVP
+
+- O MVP não associa a saída a lotes de compra e não aplica FIFO ou custo médio.
+- Ao registrar a venda, o sistema copia o `purchasePrice` vigente do produto para o
+  `unitCostSnapshot` do item vendido.
+- O relatório soma os snapshots de receita e custo dos itens de vendas concluídas.
+- Alterações posteriores no cadastro do produto não recalculam margens históricas.
+
 ## Fluxo Principal
 
 1. O ator inicia a operação.

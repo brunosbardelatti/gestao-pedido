@@ -2294,6 +2294,12 @@ components:
       examples:
       - '49.90'
       description: Valor decimal serializado como string para evitar perda de precisão.
+    SignedMoney:
+      type: string
+      pattern: ^-?\d+(\.\d{1,2})?$
+      examples:
+      - '-12.50'
+      description: Valor monetário que admite resultado negativo, serializado como string.
     PaginationMeta:
       type: object
       required:
@@ -3136,7 +3142,7 @@ components:
         cost:
           $ref: '#/components/schemas/Money'
         margin:
-          $ref: '#/components/schemas/Money'
+          $ref: '#/components/schemas/SignedMoney'
         marginPercent:
           type:
           - number

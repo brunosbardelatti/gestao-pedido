@@ -11,6 +11,7 @@ import {
   ShoppingCart,
   ReceiptText,
   Tags,
+  TrendingUp,
   UserPlus,
   Users,
 } from 'lucide-react';
@@ -130,6 +131,10 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               <Link href="/reports/sales" className="workspace-action">
                 <ChartColumn className="size-4" aria-hidden />
                 Vendas por período
+              </Link>
+              <Link href="/reports/margins" className="workspace-action">
+                <TrendingUp className="size-4" aria-hidden />
+                Margem por produto
               </Link>
             </div>
           </div>

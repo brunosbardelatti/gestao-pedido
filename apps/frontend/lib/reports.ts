@@ -50,6 +50,30 @@ export interface SalesReport {
   revenue: string;
 }
 
+export interface MarginReportQuery {
+  startDate: string;
+  endDate: string;
+  productId?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface MarginReportItem {
+  productId: string;
+  productCode: string;
+  description: string;
+  quantitySold: number;
+  revenue: string;
+  cost: string;
+  margin: string;
+  marginPercent: number | null;
+}
+
+export interface MarginReportResult {
+  items: MarginReportItem[];
+  meta: ReportPaginationMeta;
+}
+
 interface InventoryReportResponse {
   data: InventoryReportItem[];
   meta: ReportPaginationMeta;
@@ -57,6 +81,11 @@ interface InventoryReportResponse {
 
 interface SalesReportResponse {
   data: SalesReport;
+}
+
+interface MarginReportResponse {
+  data: MarginReportItem[];
+  meta: ReportPaginationMeta;
 }
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
@@ -111,6 +140,35 @@ export async function getSalesReport(
 
     const body = (await response.json()) as SalesReportResponse;
     return body.data;
+  } catch {
+    return null;
+  }
+}
+
+export async function getMarginReport(
+  query: MarginReportQuery,
+): Promise<MarginReportResult | null> {
+  const cookieStore = await cookies();
+  const searchParams = new URLSearchParams({
+    startDate: query.startDate,
+    endDate: query.endDate,
+    page: String(query.page ?? 1),
+    pageSize: String(query.pageSize ?? 20),
+  });
+  if (query.productId) searchParams.set('productId', query.productId);
+
+  try {
+    const response = await fetch(
+      `${apiUrl}/api/v1/reports/margins?${searchParams.toString()}`,
+      {
+        headers: { Cookie: cookieStore.toString() },
+        cache: 'no-store',
+      },
+    );
+    if (!response.ok) return null;
+
+    const body = (await response.json()) as MarginReportResponse;
+    return { items: body.data, meta: body.meta };
   } catch {
     return null;
   }
