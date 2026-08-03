@@ -1,4 +1,4 @@
-﻿import { cookies } from 'next/headers';
+import { cookies } from 'next/headers';
 
 export interface CatalogOption {
   id: string;
@@ -77,4 +77,3 @@ export async function getProductCatalogReferences(
     return null;
   }
 }
-

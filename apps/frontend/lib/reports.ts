@@ -1,4 +1,4 @@
-﻿import { cookies } from 'next/headers';
+import { cookies } from 'next/headers';
 
 export type InventoryReportSort =
   | 'description'
@@ -231,4 +231,3 @@ export async function getMarginReport(
     return null;
   }
 }
-

@@ -1,4 +1,4 @@
-﻿import { cookies } from 'next/headers';
+import { cookies } from 'next/headers';
 
 export interface CurrentUser {
   id: string;
@@ -28,4 +28,3 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     return null;
   }
 }
-

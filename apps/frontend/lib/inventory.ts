@@ -1,4 +1,4 @@
-﻿import { cookies } from 'next/headers';
+import { cookies } from 'next/headers';
 
 import { listProducts } from './products';
 
@@ -207,4 +207,3 @@ export async function getInventoryAdjustmentProducts(): Promise<
     balance: balances.get(product.id) ?? 0,
   }));
 }
-

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -30,7 +30,7 @@ const orderItemSchema = z.object({
   productId: z
     .string()
     .min(1, 'Selecione o produto.')
-    .regex(uuidPattern, 'Selecione um produto vÃ¡lido.'),
+    .regex(uuidPattern, 'Selecione um produto válido.'),
   quantityOrdered: z
     .number({ error: 'Informe a quantidade.' })
     .int('A quantidade deve ser inteira.')
@@ -38,16 +38,16 @@ const orderItemSchema = z.object({
   catalogUnitPrice: z
     .string()
     .trim()
-    .regex(moneyPattern, 'Informe o preÃ§o de catÃ¡logo.'),
+    .regex(moneyPattern, 'Informe o preço de catálogo.'),
   purchaseUnitPrice: z
     .string()
     .trim()
-    .regex(moneyPattern, 'Informe o preÃ§o de compra.'),
+    .regex(moneyPattern, 'Informe o preço de compra.'),
   originalUnitPrice: z
     .string()
     .trim()
-    .regex(moneyPattern, 'Informe o preÃ§o original.'),
-  notes: z.string().trim().max(500, 'Use no mÃ¡ximo 500 caracteres.'),
+    .regex(moneyPattern, 'Informe o preço original.'),
+  notes: z.string().trim().max(500, 'Use no máximo 500 caracteres.'),
 });
 
 const createOrderSchema = z
@@ -55,12 +55,12 @@ const createOrderSchema = z
     brandId: z
       .string()
       .min(1, 'Selecione a marca.')
-      .regex(uuidPattern, 'Selecione uma marca vÃ¡lida.'),
+      .regex(uuidPattern, 'Selecione uma marca válida.'),
     cycle: z
       .string()
       .trim()
       .min(1, 'Informe o ciclo.')
-      .max(80, 'O ciclo deve ter no mÃ¡ximo 80 caracteres.'),
+      .max(80, 'O ciclo deve ter no máximo 80 caracteres.'),
     orderDate: z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, 'Informe a data do pedido.'),
@@ -255,8 +255,8 @@ export function OrderForm({
         setRequestError(
           body.error?.message ??
             (isUpdate
-              ? 'NÃ£o foi possÃ­vel atualizar o pedido.'
-              : 'NÃ£o foi possÃ­vel criar o pedido.'),
+              ? 'Não foi possível atualizar o pedido.'
+              : 'Não foi possível criar o pedido.'),
         );
         return;
       }
@@ -279,7 +279,7 @@ export function OrderForm({
         reset(initialValues);
       }
     } catch {
-      setRequestError('NÃ£o foi possÃ­vel conectar ao servidor. Tente novamente.');
+      setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
     }
   }
 
@@ -351,7 +351,7 @@ export function OrderForm({
           ) : null}
         </div>
         <div className="space-y-2 sm:col-span-2 lg:col-span-3">
-          <Label htmlFor="order-notes">ObservaÃ§Ãµes do pedido</Label>
+          <Label htmlFor="order-notes">Observações do pedido</Label>
           <Input id="order-notes" maxLength={1000} {...register('notes')} />
         </div>
       </div>
@@ -362,7 +362,7 @@ export function OrderForm({
             <p className="text-sm font-semibold">Itens do pedido</p>
             <p className="mt-1 text-sm text-muted-foreground">
               {brandId
-                ? `${availableProducts.length} produtos disponÃ­veis para a marca.`
+                ? `${availableProducts.length} produtos disponíveis para a marca.`
                 : 'Selecione a marca para escolher os produtos.'}
             </p>
           </div>
@@ -409,7 +409,7 @@ export function OrderForm({
                       <option value="">Selecione</option>
                       {availableProducts.map((product) => (
                         <option key={product.id} value={product.id}>
-                          {product.code} Â· {product.description}
+                          {product.code} · {product.description}
                         </option>
                       ))}
                     </NativeSelect>
@@ -444,9 +444,9 @@ export function OrderForm({
 
                 <div className="mt-5 grid gap-5 sm:grid-cols-3">
                   {[
-                    ['catalogUnitPrice', 'PreÃ§o de catÃ¡logo'],
-                    ['purchaseUnitPrice', 'PreÃ§o de compra'],
-                    ['originalUnitPrice', 'PreÃ§o original'],
+                    ['catalogUnitPrice', 'Preço de catálogo'],
+                    ['purchaseUnitPrice', 'Preço de compra'],
+                    ['originalUnitPrice', 'Preço original'],
                   ].map(([fieldName, label]) => {
                     const name = fieldName as
                       | 'catalogUnitPrice'
@@ -477,7 +477,7 @@ export function OrderForm({
                 </div>
                 <div className="mt-5 space-y-2">
                   <Label htmlFor={`order-item-${index}-notes`}>
-                    ObservaÃ§Ãµes do item
+                    Observações do item
                   </Label>
                   <Input
                     id={`order-item-${index}-notes`}
@@ -532,7 +532,7 @@ export function OrderForm({
         {isSubmitting ? (
           <>
             <LoaderCircle className="size-4 animate-spin" aria-hidden />
-            {isUpdate ? 'Salvando alteraÃ§Ãµes' : 'Criando pedido'}
+            {isUpdate ? 'Salvando alterações' : 'Criando pedido'}
           </>
         ) : (
           <>
@@ -541,7 +541,7 @@ export function OrderForm({
             ) : (
               <ClipboardPlus className="size-4" aria-hidden />
             )}
-            {isUpdate ? 'Salvar alteraÃ§Ãµes' : 'Criar pedido'}
+            {isUpdate ? 'Salvar alterações' : 'Criar pedido'}
           </>
         )}
       </Button>
@@ -567,4 +567,3 @@ export function CreateOrderForm({
     />
   );
 }
-

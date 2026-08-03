@@ -1,4 +1,4 @@
-﻿import { cookies } from 'next/headers';
+import { cookies } from 'next/headers';
 
 interface ProductReference {
   id: string;
@@ -102,4 +102,3 @@ export async function listProducts(
     return null;
   }
 }
-

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,7 +16,7 @@ const createBrandSchema = z.object({
     .string()
     .trim()
     .min(1, 'Informe o nome da marca.')
-    .max(100, 'O nome deve ter no mÃ¡ximo 100 caracteres.'),
+    .max(100, 'O nome deve ter no máximo 100 caracteres.'),
 });
 
 type CreateBrandFields = z.infer<typeof createBrandSchema>;
@@ -70,7 +70,7 @@ export function CreateBrandForm(): React.JSX.Element {
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as ApiErrorEnvelope;
         setRequestError(
-          body.error?.message ?? 'NÃ£o foi possÃ­vel cadastrar a marca.',
+          body.error?.message ?? 'Não foi possível cadastrar a marca.',
         );
         return;
       }
@@ -80,7 +80,7 @@ export function CreateBrandForm(): React.JSX.Element {
       setCreatedBrand({ id: body.data.id, name: body.data.name });
       setFocus('name');
     } catch {
-      setRequestError('NÃ£o foi possÃ­vel conectar ao servidor. Tente novamente.');
+      setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
     }
   }
 
@@ -154,4 +154,3 @@ export function CreateBrandForm(): React.JSX.Element {
     </form>
   );
 }
-

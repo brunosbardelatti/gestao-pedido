@@ -1,4 +1,4 @@
-﻿import { cookies } from 'next/headers';
+import { cookies } from 'next/headers';
 
 export interface CustomerDetails {
   id: string;
@@ -88,4 +88,3 @@ export async function listCustomers(
     return null;
   }
 }
-

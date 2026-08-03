@@ -1,4 +1,4 @@
-﻿import { cookies } from 'next/headers';
+import { cookies } from 'next/headers';
 
 import type { CustomerDetails } from './customers';
 import { listCustomers } from './customers';
@@ -191,4 +191,3 @@ export async function getSaleCatalog(): Promise<SaleCatalog | null> {
       .map((customer) => ({ id: customer.id, name: customer.name })),
   };
 }
-

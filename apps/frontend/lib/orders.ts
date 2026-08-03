@@ -1,4 +1,4 @@
-﻿import { cookies } from 'next/headers';
+import { cookies } from 'next/headers';
 
 import type { CatalogOption } from './catalog';
 import { getProductCatalogReferences } from './catalog';
@@ -148,4 +148,3 @@ export async function getOrderCatalog(): Promise<OrderCatalog | null> {
     ],
   };
 }
-

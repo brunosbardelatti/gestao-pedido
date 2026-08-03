@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,25 +23,25 @@ const customerSchema = z.object({
     .string()
     .trim()
     .min(1, 'Informe o nome do cliente.')
-    .max(150, 'O nome deve ter no mÃ¡ximo 150 caracteres.'),
+    .max(150, 'O nome deve ter no máximo 150 caracteres.'),
   cpf: z
     .string()
     .trim()
     .refine((value) => value === '' || /^\d{11}$/.test(value), {
-      message: 'Informe os 11 dÃ­gitos do CPF.',
+      message: 'Informe os 11 dígitos do CPF.',
     }),
   phone: z
     .string()
     .trim()
-    .max(20, 'O telefone deve ter no mÃ¡ximo 20 caracteres.'),
+    .max(20, 'O telefone deve ter no máximo 20 caracteres.'),
   addressLine: z
     .string()
     .trim()
-    .max(255, 'O endereÃ§o deve ter no mÃ¡ximo 255 caracteres.'),
+    .max(255, 'O endereço deve ter no máximo 255 caracteres.'),
   city: z
     .string()
     .trim()
-    .max(100, 'A cidade deve ter no mÃ¡ximo 100 caracteres.'),
+    .max(100, 'A cidade deve ter no máximo 100 caracteres.'),
   state: z
     .string()
     .trim()
@@ -52,7 +52,7 @@ const customerSchema = z.object({
     .string()
     .trim()
     .refine((value) => value === '' || /^\d{8}$/.test(value), {
-      message: 'Informe os 8 dÃ­gitos do CEP.',
+      message: 'Informe os 8 dígitos do CEP.',
     }),
 });
 
@@ -144,7 +144,7 @@ export function CustomerForm({
         const body = (await response.json().catch(() => ({}))) as ApiErrorEnvelope;
         setRequestError(
           body.error?.message ??
-            `NÃ£o foi possÃ­vel ${isCreate ? 'cadastrar' : 'atualizar'} o cliente.`,
+            `Não foi possível ${isCreate ? 'cadastrar' : 'atualizar'} o cliente.`,
         );
         return;
       }
@@ -166,7 +166,7 @@ export function CustomerForm({
       setSavedCustomer({ id: body.data.id, name: body.data.name });
       if (isCreate) setFocus('name');
     } catch {
-      setRequestError('NÃ£o foi possÃ­vel conectar ao servidor. Tente novamente.');
+      setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
     }
   }
 
@@ -209,7 +209,7 @@ export function CustomerForm({
         </Field>
         <Field
           className="sm:col-span-2"
-          label="EndereÃ§o"
+          label="Endereço"
           error={errors.addressLine?.message}
         >
           <Input
@@ -291,7 +291,7 @@ export function CustomerForm({
         {isSubmitting ? (
           <>
             <LoaderCircle className="size-4 animate-spin" aria-hidden />
-            {isCreate ? 'Cadastrando cliente' : 'Salvando alteraÃ§Ãµes'}
+            {isCreate ? 'Cadastrando cliente' : 'Salvando alterações'}
           </>
         ) : (
           <>
@@ -300,7 +300,7 @@ export function CustomerForm({
             ) : (
               <Save className="size-4" aria-hidden />
             )}
-            {isCreate ? 'Cadastrar cliente' : 'Salvar alteraÃ§Ãµes'}
+            {isCreate ? 'Cadastrar cliente' : 'Salvar alterações'}
           </>
         )}
       </Button>
@@ -332,4 +332,3 @@ function Field({
     </div>
   );
 }
-

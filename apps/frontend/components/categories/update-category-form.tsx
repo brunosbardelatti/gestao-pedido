@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,7 +16,7 @@ const updateCategorySchema = z.object({
     .string()
     .trim()
     .min(1, 'Informe o nome da categoria.')
-    .max(100, 'O nome deve ter no mÃ¡ximo 100 caracteres.'),
+    .max(100, 'O nome deve ter no máximo 100 caracteres.'),
 });
 
 type UpdateCategoryFields = z.infer<typeof updateCategorySchema>;
@@ -74,7 +74,7 @@ export function UpdateCategoryForm({
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as ApiErrorEnvelope;
         setRequestError(
-          body.error?.message ?? 'NÃ£o foi possÃ­vel atualizar a categoria.',
+          body.error?.message ?? 'Não foi possível atualizar a categoria.',
         );
         return;
       }
@@ -87,7 +87,7 @@ export function UpdateCategoryForm({
         { scroll: false },
       );
     } catch {
-      setRequestError('NÃ£o foi possÃ­vel conectar ao servidor. Tente novamente.');
+      setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
     }
   }
 
@@ -139,16 +139,15 @@ export function UpdateCategoryForm({
         {isSubmitting ? (
           <>
             <LoaderCircle className="size-4 animate-spin" aria-hidden />
-            Salvando alteraÃ§Ãµes
+            Salvando alterações
           </>
         ) : (
           <>
             <Save className="size-4" aria-hidden />
-            Salvar alteraÃ§Ãµes
+            Salvar alterações
           </>
         )}
       </Button>
     </form>
   );
 }
-

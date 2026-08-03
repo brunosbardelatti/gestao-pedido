@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { AlertCircle, Check, Download, LoaderCircle } from 'lucide-react';
@@ -32,7 +32,7 @@ export function DownloadSaleReceiptButton({
       });
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as ApiErrorEnvelope;
-        setRequestError(body.error?.message ?? 'NÃ£o foi possÃ­vel baixar o recibo.');
+        setRequestError(body.error?.message ?? 'Não foi possível baixar o recibo.');
         return;
       }
       const objectUrl = URL.createObjectURL(await response.blob());
@@ -45,7 +45,7 @@ export function DownloadSaleReceiptButton({
       URL.revokeObjectURL(objectUrl);
       setDownloaded(true);
     } catch {
-      setRequestError('NÃ£o foi possÃ­vel conectar ao servidor. Tente novamente.');
+      setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
     } finally {
       setIsDownloading(false);
     }
@@ -81,4 +81,3 @@ export function DownloadSaleReceiptButton({
     </div>
   );
 }
-

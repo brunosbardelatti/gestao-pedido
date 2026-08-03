@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -27,39 +27,39 @@ const productSchema = z.object({
   brandId: z
     .string()
     .min(1, 'Selecione a marca.')
-    .regex(uuidPattern, 'Selecione uma marca vÃ¡lida.'),
+    .regex(uuidPattern, 'Selecione uma marca válida.'),
   categoryId: z
     .string()
     .min(1, 'Selecione a categoria.')
-    .regex(uuidPattern, 'Selecione uma categoria vÃ¡lida.'),
+    .regex(uuidPattern, 'Selecione uma categoria válida.'),
   code: z
     .string()
     .trim()
-    .min(1, 'Informe o cÃ³digo do produto.')
-    .max(80, 'O cÃ³digo deve ter no mÃ¡ximo 80 caracteres.'),
+    .min(1, 'Informe o código do produto.')
+    .max(80, 'O código deve ter no máximo 80 caracteres.'),
   description: z
     .string()
     .trim()
-    .min(1, 'Informe a descriÃ§Ã£o.')
-    .max(255, 'A descriÃ§Ã£o deve ter no mÃ¡ximo 255 caracteres.'),
+    .min(1, 'Informe a descrição.')
+    .max(255, 'A descrição deve ter no máximo 255 caracteres.'),
   catalogPrice: z
     .string()
     .trim()
-    .regex(moneyPattern, 'Informe um preÃ§o de catÃ¡logo vÃ¡lido.'),
+    .regex(moneyPattern, 'Informe um preço de catálogo válido.'),
   purchasePrice: z
     .string()
     .trim()
-    .regex(moneyPattern, 'Informe um preÃ§o de compra vÃ¡lido.'),
+    .regex(moneyPattern, 'Informe um preço de compra válido.'),
   originalPrice: z
     .string()
     .trim()
-    .regex(moneyPattern, 'Informe um preÃ§o original vÃ¡lido.'),
+    .regex(moneyPattern, 'Informe um preço original válido.'),
   suggestedSalePrice: z
     .string()
     .trim()
     .refine(
       (value) => value.length === 0 || moneyPattern.test(value),
-      'Informe um preÃ§o sugerido vÃ¡lido.',
+      'Informe um preço sugerido válido.',
     ),
 });
 
@@ -175,8 +175,8 @@ export function ProductForm({
         setRequestError(
           body.error?.message ??
             (isUpdate
-              ? 'NÃ£o foi possÃ­vel atualizar o produto.'
-              : 'NÃ£o foi possÃ­vel cadastrar o produto.'),
+              ? 'Não foi possível atualizar o produto.'
+              : 'Não foi possível cadastrar o produto.'),
         );
         return;
       }
@@ -203,7 +203,7 @@ export function ProductForm({
       setSuccess({ id: body.data.id, code: body.data.code });
       if (isUpdate) onUpdated?.();
     } catch {
-      setRequestError('NÃ£o foi possÃ­vel conectar ao servidor. Tente novamente.');
+      setRequestError('Não foi possível conectar ao servidor. Tente novamente.');
     }
   }
 
@@ -242,7 +242,7 @@ export function ProductForm({
           </NativeSelect>
           {brands.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              Nenhuma marca ativa disponÃ­vel.{' '}
+              Nenhuma marca ativa disponível.{' '}
               <Link className="font-semibold text-ring hover:underline" href="/brands/new">
                 Cadastrar marca
               </Link>
@@ -275,7 +275,7 @@ export function ProductForm({
           </NativeSelect>
           {categories.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              Nenhuma categoria ativa disponÃ­vel.{' '}
+              Nenhuma categoria ativa disponível.{' '}
               <Link
                 className="font-semibold text-ring hover:underline"
                 href="/categories/new"
@@ -292,7 +292,7 @@ export function ProductForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="product-code">CÃ³digo do produto</Label>
+          <Label htmlFor="product-code">Código do produto</Label>
           <Input
             id="product-code"
             autoFocus
@@ -309,7 +309,7 @@ export function ProductForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="product-description">DescriÃ§Ã£o</Label>
+          <Label htmlFor="product-description">Descrição</Label>
           <Input
             id="product-description"
             maxLength={255}
@@ -331,10 +331,10 @@ export function ProductForm({
         <p className="text-sm font-semibold">Valores atuais</p>
         <div className="mt-4 grid gap-5 sm:grid-cols-2">
           {[
-            ['catalogPrice', 'PreÃ§o de catÃ¡logo'],
-            ['purchasePrice', 'PreÃ§o de compra'],
-            ['originalPrice', 'PreÃ§o original'],
-            ['suggestedSalePrice', 'PreÃ§o sugerido de venda (opcional)'],
+            ['catalogPrice', 'Preço de catálogo'],
+            ['purchasePrice', 'Preço de compra'],
+            ['originalPrice', 'Preço original'],
+            ['suggestedSalePrice', 'Preço sugerido de venda (opcional)'],
           ].map(([field, label]) => {
             const name = field as keyof Pick<
               ProductFields,
@@ -409,12 +409,12 @@ export function ProductForm({
         {isSubmitting ? (
           <>
             <LoaderCircle className="size-4 animate-spin" aria-hidden />
-            {isUpdate ? 'Salvando alteraÃ§Ãµes' : 'Cadastrando produto'}
+            {isUpdate ? 'Salvando alterações' : 'Cadastrando produto'}
           </>
         ) : isUpdate ? (
           <>
             <Save className="size-4" aria-hidden />
-            Salvar alteraÃ§Ãµes
+            Salvar alterações
           </>
         ) : (
           <>
@@ -426,4 +426,3 @@ export function ProductForm({
     </form>
   );
 }
-
