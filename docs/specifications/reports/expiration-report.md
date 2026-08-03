@@ -26,6 +26,10 @@ Listar itens recebidos com vencimento próximo.
 - Permitir consulta por intervalo futuro.
 - Ordenar por vencimento crescente.
 - Como não há consumo por lote, o relatório é indicativo e deve deixar essa limitação clara.
+- Considerar apenas itens de pedidos recebidos com quantidade recebida positiva.
+- `fromDate` assume a data UTC atual quando omitida.
+- `toDate`, quando informada, define o fim inclusivo do intervalo; quando omitida,
+  o fim é calculado somando `withinDays` (sete por padrão) a `fromDate`.
 
 ## Fluxo Principal
 

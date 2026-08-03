@@ -4,6 +4,7 @@ import {
   ChartColumn,
   ClipboardList,
   ClipboardPlus,
+  Clock,
   History,
   PackageSearch,
   Plus,
@@ -135,6 +136,10 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               <Link href="/reports/margins" className="workspace-action">
                 <TrendingUp className="size-4" aria-hidden />
                 Margem por produto
+              </Link>
+              <Link href="/reports/expirations" className="workspace-action">
+                <Clock className="size-4" aria-hidden />
+                Produtos próximos do vencimento
               </Link>
             </div>
           </div>

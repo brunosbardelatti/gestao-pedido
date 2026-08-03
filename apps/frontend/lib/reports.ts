@@ -88,6 +88,35 @@ interface MarginReportResponse {
   meta: ReportPaginationMeta;
 }
 
+export interface ExpirationReportQuery {
+  fromDate?: string;
+  toDate?: string;
+  withinDays?: number;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface ExpirationReportItem {
+  orderItemId: string;
+  productId: string;
+  productCode: string;
+  description: string;
+  expirationDate: string;
+  quantityReceived: number;
+  daysUntilExpiration: number;
+  note: string;
+}
+
+export interface ExpirationReportResult {
+  items: ExpirationReportItem[];
+  meta: ReportPaginationMeta;
+}
+
+interface ExpirationReportResponse {
+  data: ExpirationReportItem[];
+  meta: ReportPaginationMeta;
+}
+
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export async function getInventoryReport(
@@ -140,6 +169,35 @@ export async function getSalesReport(
 
     const body = (await response.json()) as SalesReportResponse;
     return body.data;
+  } catch {
+    return null;
+  }
+}
+
+export async function getExpirationReport(
+  query: ExpirationReportQuery,
+): Promise<ExpirationReportResult | null> {
+  const cookieStore = await cookies();
+  const searchParams = new URLSearchParams();
+  if (query.fromDate) searchParams.set('fromDate', query.fromDate);
+  if (query.toDate) searchParams.set('toDate', query.toDate);
+  if (query.withinDays !== undefined)
+    searchParams.set('withinDays', String(query.withinDays));
+  searchParams.set('page', String(query.page ?? 1));
+  searchParams.set('pageSize', String(query.pageSize ?? 20));
+
+  try {
+    const response = await fetch(
+      `${apiUrl}/api/v1/reports/expirations?${searchParams.toString()}`,
+      {
+        headers: { Cookie: cookieStore.toString() },
+        cache: 'no-store',
+      },
+    );
+    if (!response.ok) return null;
+
+    const body = (await response.json()) as ExpirationReportResponse;
+    return { items: body.data, meta: body.meta };
   } catch {
     return null;
   }

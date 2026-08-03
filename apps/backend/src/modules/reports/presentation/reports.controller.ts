@@ -2,9 +2,11 @@ import { Controller, Get, Inject, Query, Req, ValidationPipe } from '@nestjs/com
 
 import type { RequestWithId } from '../../../common/http/request-with-id';
 import { GetCurrentUserUseCase } from '../../auth/application/use-cases/get-current-user.use-case';
+import { GetExpirationReportUseCase } from '../application/use-cases/get-expiration-report.use-case';
 import { GetInventoryReportUseCase } from '../application/use-cases/get-inventory-report.use-case';
 import { GetMarginReportUseCase } from '../application/use-cases/get-margin-report.use-case';
 import { GetSalesReportUseCase } from '../application/use-cases/get-sales-report.use-case';
+import { GetExpirationReportQueryDto } from './dto/get-expiration-report-query.dto';
 import { GetInventoryReportQueryDto } from './dto/get-inventory-report-query.dto';
 import { GetMarginReportQueryDto } from './dto/get-margin-report-query.dto';
 import { GetSalesReportQueryDto } from './dto/get-sales-report-query.dto';
@@ -20,7 +22,29 @@ export class ReportsController {
     private readonly getSalesReportUseCase: GetSalesReportUseCase,
     @Inject(GetMarginReportUseCase)
     private readonly getMarginReportUseCase: GetMarginReportUseCase,
+    @Inject(GetExpirationReportUseCase)
+    private readonly getExpirationReportUseCase: GetExpirationReportUseCase,
   ) {}
+
+  @Get('expirations')
+  async getExpirations(
+    @Query(
+      new ValidationPipe({
+        expectedType: GetExpirationReportQueryDto,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    )
+    query: GetExpirationReportQueryDto,
+    @Req() request: RequestWithId,
+  ) {
+    const cookies = request.cookies as Record<string, string | undefined>;
+    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    const result = await this.getExpirationReportUseCase.execute(query);
+
+    return { data: result.items, meta: result.meta };
+  }
 
   @Get('margins')
   async getMargins(
