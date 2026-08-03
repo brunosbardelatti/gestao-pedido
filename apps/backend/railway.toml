@@ -3,6 +3,6 @@ builder = "NIXPACKS"
 buildCommand = "npx prisma generate --schema apps/backend/prisma/schema.prisma && npm run build --workspace @gestao-pedidos/backend"
 
 [deploy]
-startCommand = "npx prisma migrate deploy --schema apps/backend/prisma/schema.prisma && npm run start --workspace @gestao-pedidos/backend"
+startCommand = "npx prisma migrate deploy --schema apps/backend/prisma/schema.prisma && npm run prisma:seed --workspace @gestao-pedidos/backend && npm run start --workspace @gestao-pedidos/backend"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3

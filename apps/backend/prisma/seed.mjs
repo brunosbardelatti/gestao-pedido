@@ -20,7 +20,6 @@ async function main() {
     update: {
       name,
       login,
-      passwordHash,
       role: UserRole.ADMIN,
       active: true,
     },
