@@ -77,10 +77,11 @@ export class AuthController {
     });
     const maxAge = result.session.expiresAt.getTime() - Date.now();
 
+    const crossOrigin = process.env.NODE_ENV === 'production';
     response.cookie('session', result.session.token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: crossOrigin,
+      sameSite: crossOrigin ? 'none' : 'lax',
       path: '/',
       maxAge,
       expires: result.session.expiresAt,
@@ -102,10 +103,11 @@ export class AuthController {
       requestId: request.requestId,
     });
 
+    const crossOrigin = process.env.NODE_ENV === 'production';
     response.clearCookie('session', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: crossOrigin,
+      sameSite: crossOrigin ? 'none' : 'lax',
       path: '/',
     });
   }
