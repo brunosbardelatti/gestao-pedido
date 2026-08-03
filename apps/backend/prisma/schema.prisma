@@ -58,6 +58,12 @@ enum IdempotencyStatus {
   FAILED
 }
 
+enum ImportedOrderStatus {
+  DRAFT
+  APPROVED
+  REJECTED
+}
+
 model User {
   id              String   @id @default(uuid()) @db.Uuid
   name            String   @db.VarChar(120)
@@ -89,6 +95,8 @@ model User {
   customersUpdated  Customer[]          @relation("CustomerUpdatedBy")
   salesCreated      Sale[]              @relation("SaleCreatedBy")
   salesCanceled     Sale[]              @relation("SaleCanceledBy")
+  importedOrdersImported ImportedOrder[] @relation("ImportedOrderImportedBy")
+  importedOrdersReviewed ImportedOrder[] @relation("ImportedOrderReviewedBy")
 
   @@index([active])
   @@map("users")
@@ -226,8 +234,9 @@ model Order {
   createdBy  User        @relation("OrderCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
   updatedBy  User        @relation("OrderUpdatedBy", fields: [updatedById], references: [id], onDelete: Restrict)
   receivedBy User?       @relation("OrderReceivedBy", fields: [receivedById], references: [id], onDelete: Restrict)
-  canceledBy User?       @relation("OrderCanceledBy", fields: [canceledById], references: [id], onDelete: Restrict)
-  items      OrderItem[]
+  canceledBy     User?           @relation("OrderCanceledBy", fields: [canceledById], references: [id], onDelete: Restrict)
+  items          OrderItem[]
+  importedOrders ImportedOrder[]
 
   @@index([brandId, cycle])
   @@index([status, orderDate])
@@ -397,6 +406,44 @@ model IdempotencyRecord {
   @@index([expiresAt])
   @@index([status])
   @@map("idempotency_records")
+}
+
+model ImportedOrder {
+  id              String              @id @default(uuid()) @db.Uuid
+  idempotencyKey  String              @unique @map("idempotency_key") @db.VarChar(120)
+  nfeAccessKey    String?             @map("nfe_access_key") @db.VarChar(44)
+  supplierName    String?             @map("supplier_name") @db.VarChar(255)
+  status          ImportedOrderStatus @default(DRAFT)
+  rawXml          String              @map("raw_xml") @db.Text
+  parsedData      Json                @map("parsed_data")
+  orderId         String?             @map("order_id") @db.Uuid
+  rejectionReason String?             @map("rejection_reason") @db.VarChar(500)
+  importedById    String              @map("imported_by_id") @db.Uuid
+  reviewedById    String?             @map("reviewed_by_id") @db.Uuid
+  reviewedAt      DateTime?           @map("reviewed_at") @db.Timestamptz(6)
+  createdAt       DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  importedBy User  @relation("ImportedOrderImportedBy", fields: [importedById], references: [id], onDelete: Restrict)
+  reviewedBy User? @relation("ImportedOrderReviewedBy", fields: [reviewedById], references: [id], onDelete: Restrict)
+  order      Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  items      ImportedOrderItem[]
+
+  @@index([status])
+  @@map("imported_orders")
+}
+
+model ImportedOrderItem {
+  id              String  @id @default(uuid()) @db.Uuid
+  importedOrderId String  @map("imported_order_id") @db.Uuid
+  productCode     String  @map("product_code") @db.VarChar(80)
+  description     String  @db.VarChar(255)
+  quantity        Int
+  unitPrice       Decimal @map("unit_price") @db.Decimal(12, 2)
+
+  importedOrder ImportedOrder @relation(fields: [importedOrderId], references: [id], onDelete: Cascade)
+
+  @@map("imported_order_items")
 }
 
 /**

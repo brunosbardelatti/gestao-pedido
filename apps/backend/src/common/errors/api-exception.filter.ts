@@ -67,8 +67,13 @@ import { SaleProductInactiveError } from '../../modules/sales/domain/errors/sale
 import { SaleProductNotFoundError } from '../../modules/sales/domain/errors/sale-product-not-found.error';
 import { ApiKeyAlreadyRevokedError } from '../../modules/integrations/domain/errors/api-key-already-revoked.error';
 import { ApiKeyNotFoundError } from '../../modules/integrations/domain/errors/api-key-not-found.error';
+import { IdempotencyKeyRequiredError } from '../../modules/integrations/domain/errors/idempotency-key-required.error';
+import { ImportIdempotencyConflictError } from '../../modules/integrations/domain/errors/import-idempotency-conflict.error';
+import { ImportedOrderNotDraftError } from '../../modules/integrations/domain/errors/imported-order-not-draft.error';
+import { ImportedOrderNotFoundError } from '../../modules/integrations/domain/errors/imported-order-not-found.error';
 import { InvalidApiKeyError } from '../../modules/integrations/domain/errors/invalid-api-key.error';
 import { InvalidApiKeyNameError } from '../../modules/integrations/domain/errors/invalid-api-key-name.error';
+import { InvalidNfeXmlError } from '../../modules/integrations/domain/errors/invalid-nfe-xml.error';
 import type { RequestWithId } from '../http/request-with-id';
 
 interface HttpExceptionBody {
@@ -311,6 +316,46 @@ export class ApiExceptionFilter implements ExceptionFilter {
     ) {
       return {
         status: HttpStatus.UNPROCESSABLE_ENTITY,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof ImportedOrderNotFoundError) {
+      return {
+        status: HttpStatus.NOT_FOUND,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof ImportedOrderNotDraftError) {
+      return {
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof InvalidNfeXmlError) {
+      return {
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof IdempotencyKeyRequiredError) {
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof ImportIdempotencyConflictError) {
+      return {
+        status: HttpStatus.CONFLICT,
         code: exception.code,
         message: exception.message,
       };
