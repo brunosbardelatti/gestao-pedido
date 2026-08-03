@@ -50,6 +50,7 @@ export class ApiKeysController {
     const cookies = request.cookies as Record<string, string | undefined>;
     const user = await this.getCurrentUserUseCase.execute({
       token: cookies.session,
+    apiKey: request.get('x-api-key'),
     });
 
     const result = await this.createApiKeyUseCase.execute({
@@ -77,7 +78,7 @@ export class ApiKeysController {
     @Req() request: RequestWithId,
   ) {
     const cookies = request.cookies as Record<string, string | undefined>;
-    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    await this.getCurrentUserUseCase.execute({ token: cookies.session, apiKey: request.get('x-api-key') });
 
     const result = await this.listApiKeysUseCase.execute(query);
     return { data: result.items, meta: result.meta };
@@ -92,6 +93,7 @@ export class ApiKeysController {
     const cookies = request.cookies as Record<string, string | undefined>;
     const user = await this.getCurrentUserUseCase.execute({
       token: cookies.session,
+    apiKey: request.get('x-api-key'),
     });
 
     await this.revokeApiKeyUseCase.execute({

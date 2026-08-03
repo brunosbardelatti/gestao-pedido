@@ -5,12 +5,14 @@ import type { ApiKeyHashService } from './application/ports/api-key-hash.service
 import type { ApproveImportedOrderPersistence } from './application/ports/approve-imported-order-persistence';
 import type { CreateApiKeyPersistence } from './application/ports/create-api-key-persistence';
 import type { ImportNfePersistence } from './application/ports/import-nfe-persistence';
+import type { RejectImportedOrderPersistence } from './application/ports/reject-imported-order-persistence';
 import {
   API_KEY_HASH_SERVICE,
   APPROVE_IMPORTED_ORDER_PERSISTENCE,
   CREATE_API_KEY_PERSISTENCE,
   IMPORT_NFE_PERSISTENCE,
   LIST_API_KEYS_PERSISTENCE,
+  REJECT_IMPORTED_ORDER_PERSISTENCE,
   REVOKE_API_KEY_PERSISTENCE,
 } from './application/ports/integrations.tokens';
 import type { ListApiKeysPersistence } from './application/ports/list-api-keys-persistence';
@@ -19,11 +21,13 @@ import { ApproveImportedOrderUseCase } from './application/use-cases/approve-imp
 import { CreateApiKeyUseCase } from './application/use-cases/create-api-key.use-case';
 import { ImportNfeUseCase } from './application/use-cases/import-nfe.use-case';
 import { ListApiKeysUseCase } from './application/use-cases/list-api-keys.use-case';
+import { RejectImportedOrderUseCase } from './application/use-cases/reject-imported-order.use-case';
 import { RevokeApiKeyUseCase } from './application/use-cases/revoke-api-key.use-case';
 import { CryptoApiKeyHashService } from './infrastructure/cryptography/crypto-api-key-hash.service';
 import { PrismaApproveImportedOrderPersistence } from './infrastructure/persistence/prisma-approve-imported-order.persistence';
 import { PrismaCreateApiKeyPersistence } from './infrastructure/persistence/prisma-create-api-key.persistence';
 import { PrismaImportNfePersistence } from './infrastructure/persistence/prisma-import-nfe.persistence';
+import { PrismaRejectImportedOrderPersistence } from './infrastructure/persistence/prisma-reject-imported-order.persistence';
 import { PrismaListApiKeysPersistence } from './infrastructure/persistence/prisma-list-api-keys.persistence';
 import { PrismaRevokeApiKeyPersistence } from './infrastructure/persistence/prisma-revoke-api-key.persistence';
 import { ApiKeysController } from './presentation/api-keys.controller';
@@ -39,6 +43,7 @@ import { NfeImportsController } from './presentation/nfe-imports.controller';
     PrismaListApiKeysPersistence,
     PrismaImportNfePersistence,
     PrismaApproveImportedOrderPersistence,
+    PrismaRejectImportedOrderPersistence,
     {
       provide: API_KEY_HASH_SERVICE,
       useExisting: CryptoApiKeyHashService,
@@ -62,6 +67,10 @@ import { NfeImportsController } from './presentation/nfe-imports.controller';
     {
       provide: APPROVE_IMPORTED_ORDER_PERSISTENCE,
       useExisting: PrismaApproveImportedOrderPersistence,
+    },
+    {
+      provide: REJECT_IMPORTED_ORDER_PERSISTENCE,
+      useExisting: PrismaRejectImportedOrderPersistence,
     },
     {
       provide: CreateApiKeyUseCase,
@@ -94,6 +103,12 @@ import { NfeImportsController } from './presentation/nfe-imports.controller';
       inject: [APPROVE_IMPORTED_ORDER_PERSISTENCE],
       useFactory: (persistence: ApproveImportedOrderPersistence) =>
         new ApproveImportedOrderUseCase(persistence),
+    },
+    {
+      provide: RejectImportedOrderUseCase,
+      inject: [REJECT_IMPORTED_ORDER_PERSISTENCE],
+      useFactory: (persistence: RejectImportedOrderPersistence) =>
+        new RejectImportedOrderUseCase(persistence),
     },
   ],
 })

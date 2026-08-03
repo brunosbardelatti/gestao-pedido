@@ -51,7 +51,7 @@ export class CustomersController {
     @Req() request: RequestWithId,
   ) {
     const cookies = request.cookies as Record<string, string | undefined>;
-    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    await this.getCurrentUserUseCase.execute({ token: cookies.session, apiKey: request.get('x-api-key') });
     const result = await this.listCustomersUseCase.execute(query);
     return { data: result.items, meta: result.meta };
   }
@@ -62,7 +62,7 @@ export class CustomersController {
     @Req() request: RequestWithId,
   ) {
     const cookies = request.cookies as Record<string, string | undefined>;
-    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    await this.getCurrentUserUseCase.execute({ token: cookies.session, apiKey: request.get('x-api-key') });
     return { data: await this.getCustomerUseCase.execute(customerId) };
   }
 
@@ -82,6 +82,7 @@ export class CustomersController {
     const cookies = request.cookies as Record<string, string | undefined>;
     const actor = await this.getCurrentUserUseCase.execute({
       token: cookies.session,
+    apiKey: request.get('x-api-key'),
     });
     const customer = await this.createCustomerUseCase.execute({
       actorId: actor.id,
@@ -109,6 +110,7 @@ export class CustomersController {
     const cookies = request.cookies as Record<string, string | undefined>;
     const actor = await this.getCurrentUserUseCase.execute({
       token: cookies.session,
+    apiKey: request.get('x-api-key'),
     });
     const customer = await this.updateCustomerUseCase.execute({
       actorId: actor.id,

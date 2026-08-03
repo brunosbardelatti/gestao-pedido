@@ -56,7 +56,7 @@ export class SalesController {
     @Req() request: RequestWithId,
   ) {
     const cookies = request.cookies as Record<string, string | undefined>;
-    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    await this.getCurrentUserUseCase.execute({ token: cookies.session, apiKey: request.get('x-api-key') });
     const result = await this.listSalesUseCase.execute(query);
     return { data: result.items, meta: result.meta };
   }
@@ -70,6 +70,7 @@ export class SalesController {
     const cookies = request.cookies as Record<string, string | undefined>;
     const actor = await this.getCurrentUserUseCase.execute({
       token: cookies.session,
+    apiKey: request.get('x-api-key'),
     });
     const receipt = await this.downloadSaleReceiptUseCase.execute({
       actorId: actor.id,
@@ -111,6 +112,7 @@ export class SalesController {
     const cookies = request.cookies as Record<string, string | undefined>;
     const actor = await this.getCurrentUserUseCase.execute({
       token: cookies.session,
+    apiKey: request.get('x-api-key'),
     });
     const sale = await this.cancelSaleUseCase.execute({
       actorId: actor.id,
@@ -143,7 +145,7 @@ export class SalesController {
       { type: 'custom' },
     );
     const cookies = request.cookies as Record<string, string | undefined>;
-    const actor = await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    const actor = await this.getCurrentUserUseCase.execute({ token: cookies.session, apiKey: request.get('x-api-key') });
     const sale = await this.createSaleUseCase.execute({
       actorId: actor.id,
       idempotencyKey,

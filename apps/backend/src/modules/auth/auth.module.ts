@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import {
+  API_KEY_VALIDATOR,
   CLOCK,
   LOGIN_PERSISTENCE,
   LOGOUT_PERSISTENCE,
@@ -10,6 +11,7 @@ import {
   SESSION_TOKEN_SERVICE,
   USER_REPOSITORY,
 } from './application/ports/auth.tokens';
+import type { ApiKeyValidator } from './application/ports/api-key-validator';
 import type { Clock } from './application/ports/clock';
 import type { LoginPersistence } from './application/ports/login-persistence';
 import type { LogoutPersistence } from './application/ports/logout-persistence';
@@ -28,6 +30,7 @@ import { PrismaLoginPersistence } from './infrastructure/persistence/prisma-logi
 import { PrismaLogoutPersistence } from './infrastructure/persistence/prisma-logout.persistence';
 import { PrismaResetPasswordPersistence } from './infrastructure/persistence/prisma-reset-password.persistence';
 import { PrismaSessionRepository } from './infrastructure/persistence/prisma-session.repository';
+import { PrismaApiKeyValidator } from './infrastructure/persistence/prisma-api-key-validator';
 import { PrismaUserRepository } from './infrastructure/persistence/prisma-user.repository';
 import { SystemClock } from './infrastructure/system-clock';
 import { AuthController } from './presentation/auth.controller';
@@ -46,6 +49,7 @@ function sessionTtlMs(): number {
     PrismaLogoutPersistence,
     PrismaResetPasswordPersistence,
     PrismaSessionRepository,
+    PrismaApiKeyValidator,
     Argon2PasswordHasher,
     CryptoSessionTokenService,
     SystemClock,
@@ -60,6 +64,7 @@ function sessionTtlMs(): number {
     { provide: PASSWORD_HASHER, useExisting: Argon2PasswordHasher },
     { provide: SESSION_TOKEN_SERVICE, useExisting: CryptoSessionTokenService },
     { provide: CLOCK, useExisting: SystemClock },
+    { provide: API_KEY_VALIDATOR, useExisting: PrismaApiKeyValidator },
     {
       provide: LoginUseCase,
       inject: [
@@ -87,12 +92,13 @@ function sessionTtlMs(): number {
     },
     {
       provide: GetCurrentUserUseCase,
-      inject: [SESSION_REPOSITORY, SESSION_TOKEN_SERVICE, CLOCK],
+      inject: [SESSION_REPOSITORY, SESSION_TOKEN_SERVICE, CLOCK, API_KEY_VALIDATOR],
       useFactory: (
         sessions: SessionRepository,
         tokens: SessionTokenService,
         clock: Clock,
-      ) => new GetCurrentUserUseCase(sessions, tokens, clock),
+        apiKeyValidator: ApiKeyValidator,
+      ) => new GetCurrentUserUseCase(sessions, tokens, clock, apiKeyValidator),
     },
     {
       provide: LogoutUseCase,

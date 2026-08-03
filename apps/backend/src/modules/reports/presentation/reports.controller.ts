@@ -40,7 +40,7 @@ export class ReportsController {
     @Req() request: RequestWithId,
   ) {
     const cookies = request.cookies as Record<string, string | undefined>;
-    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    await this.getCurrentUserUseCase.execute({ token: cookies.session, apiKey: request.get('x-api-key') });
     const result = await this.getExpirationReportUseCase.execute(query);
 
     return { data: result.items, meta: result.meta };
@@ -60,7 +60,7 @@ export class ReportsController {
     @Req() request: RequestWithId,
   ) {
     const cookies = request.cookies as Record<string, string | undefined>;
-    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    await this.getCurrentUserUseCase.execute({ token: cookies.session, apiKey: request.get('x-api-key') });
     const result = await this.getMarginReportUseCase.execute(query);
 
     return { data: result.items, meta: result.meta };
@@ -80,7 +80,7 @@ export class ReportsController {
     @Req() request: RequestWithId,
   ) {
     const cookies = request.cookies as Record<string, string | undefined>;
-    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    await this.getCurrentUserUseCase.execute({ token: cookies.session, apiKey: request.get('x-api-key') });
     const result = await this.getSalesReportUseCase.execute(query);
 
     return { data: result };
@@ -100,7 +100,7 @@ export class ReportsController {
     @Req() request: RequestWithId,
   ) {
     const cookies = request.cookies as Record<string, string | undefined>;
-    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    await this.getCurrentUserUseCase.execute({ token: cookies.session, apiKey: request.get('x-api-key') });
     const result = await this.getInventoryReportUseCase.execute(query);
 
     return { data: result.items, meta: result.meta };

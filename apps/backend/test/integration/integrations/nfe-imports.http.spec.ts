@@ -351,6 +351,65 @@ describe('NF-e import and approval endpoints', () => {
     expect(response.body.error.code).toBe('IMPORTED_ORDER_NOT_FOUND');
   });
 
+  it('rejects a draft and records audit without creating an order', async () => {
+    const cookie = await loginAsAdmin();
+
+    const importResponse = await request(app.getHttpServer())
+      .post('/api/v1/integrations/nfe-xml')
+      .set('Cookie', cookie)
+      .set('Idempotency-Key', randomUUID())
+      .send({ xml: VALID_XML })
+      .expect(201);
+
+    const importedId = importResponse.body.data.id;
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/integrations/imported-orders/${importedId}/reject`)
+      .set('Cookie', cookie)
+      .send({ reason: 'Dados incorretos' })
+      .expect(204);
+
+    const dbImported = await prisma.importedOrder.findUnique({
+      where: { id: importedId },
+    });
+    expect(dbImported?.status).toBe('REJECTED');
+    expect(dbImported?.rejectionReason).toBe('Dados incorretos');
+    expect(dbImported?.reviewedById).toBeTruthy();
+    expect(dbImported?.orderId).toBeNull();
+
+    const audit = await prisma.auditLog.findFirst({
+      where: { action: 'IMPORTED_ORDER_REJECTED', entityId: importedId },
+    });
+    expect(audit).toBeTruthy();
+  });
+
+  it('rejects rejecting an already rejected draft', async () => {
+    const cookie = await loginAsAdmin();
+
+    const importResponse = await request(app.getHttpServer())
+      .post('/api/v1/integrations/nfe-xml')
+      .set('Cookie', cookie)
+      .set('Idempotency-Key', randomUUID())
+      .send({ xml: VALID_XML })
+      .expect(201);
+
+    const importedId = importResponse.body.data.id;
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/integrations/imported-orders/${importedId}/reject`)
+      .set('Cookie', cookie)
+      .send({ reason: 'Primeira rejeição' })
+      .expect(204);
+
+    const response = await request(app.getHttpServer())
+      .post(`/api/v1/integrations/imported-orders/${importedId}/reject`)
+      .set('Cookie', cookie)
+      .send({ reason: 'Segunda tentativa' })
+      .expect(422);
+
+    expect(response.body.error.code).toBe('IMPORTED_ORDER_NOT_DRAFT');
+  });
+
   it('requires authentication for all endpoints', async () => {
     await request(app.getHttpServer())
       .post('/api/v1/integrations/nfe-xml')

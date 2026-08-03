@@ -65,7 +65,7 @@ export class ProductsController {
     @Req() request: RequestWithId,
   ) {
     const cookies = request.cookies as Record<string, string | undefined>;
-    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    await this.getCurrentUserUseCase.execute({ token: cookies.session, apiKey: request.get('x-api-key') });
     const result = await this.listProductsUseCase.execute(query);
 
     return { data: result.items, meta: result.meta };
@@ -77,7 +77,7 @@ export class ProductsController {
     @Req() request: RequestWithId,
   ): Promise<{ data: CreateProductOutput }> {
     const cookies = request.cookies as Record<string, string | undefined>;
-    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    await this.getCurrentUserUseCase.execute({ token: cookies.session, apiKey: request.get('x-api-key') });
 
     return { data: await this.getProductUseCase.execute(productId) };
   }
@@ -98,6 +98,7 @@ export class ProductsController {
     const cookies = request.cookies as Record<string, string | undefined>;
     const actor = await this.getCurrentUserUseCase.execute({
       token: cookies.session,
+    apiKey: request.get('x-api-key'),
     });
     const product = await this.createProductUseCase.execute({
       actorId: actor.id,
@@ -132,6 +133,7 @@ export class ProductsController {
     const cookies = request.cookies as Record<string, string | undefined>;
     const actor = await this.getCurrentUserUseCase.execute({
       token: cookies.session,
+    apiKey: request.get('x-api-key'),
     });
     const product = await this.updateProductUseCase.execute({
       actorId: actor.id,
@@ -167,6 +169,7 @@ export class ProductsController {
     const cookies = request.cookies as Record<string, string | undefined>;
     const actor = await this.getCurrentUserUseCase.execute({
       token: cookies.session,
+    apiKey: request.get('x-api-key'),
     });
     const product = await this.setProductActiveUseCase.execute({
       actorId: actor.id,

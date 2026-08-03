@@ -57,6 +57,7 @@ export class InventoryController {
     const cookies = request.cookies as Record<string, string | undefined>;
     const actor = await this.getCurrentUserUseCase.execute({
       token: cookies.session,
+    apiKey: request.get('x-api-key'),
     });
     const movement = await this.adjustStockUseCase.execute({
       actorId: actor.id,
@@ -86,7 +87,7 @@ export class InventoryController {
     @Req() request: RequestWithId,
   ) {
     const cookies = request.cookies as Record<string, string | undefined>;
-    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    await this.getCurrentUserUseCase.execute({ token: cookies.session, apiKey: request.get('x-api-key') });
     const result = await this.listInventoryMovementsUseCase.execute(query);
 
     return { data: result.items, meta: result.meta };
@@ -106,7 +107,7 @@ export class InventoryController {
     @Req() request: RequestWithId,
   ) {
     const cookies = request.cookies as Record<string, string | undefined>;
-    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    await this.getCurrentUserUseCase.execute({ token: cookies.session, apiKey: request.get('x-api-key') });
     const result = await this.getCurrentStockUseCase.execute(query);
 
     return { data: result.items, meta: result.meta };

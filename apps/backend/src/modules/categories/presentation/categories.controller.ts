@@ -53,7 +53,7 @@ export class CategoriesController {
     @Req() request: RequestWithId,
   ) {
     const cookies = request.cookies as Record<string, string | undefined>;
-    await this.getCurrentUserUseCase.execute({ token: cookies.session });
+    await this.getCurrentUserUseCase.execute({ token: cookies.session, apiKey: request.get('x-api-key') });
     const result = await this.listCategoriesUseCase.execute(query);
 
     return { data: result.items, meta: result.meta };
@@ -83,6 +83,7 @@ export class CategoriesController {
     const cookies = request.cookies as Record<string, string | undefined>;
     const actor = await this.getCurrentUserUseCase.execute({
       token: cookies.session,
+    apiKey: request.get('x-api-key'),
     });
     const category = await this.createCategoryUseCase.execute({
       actorId: actor.id,
@@ -118,6 +119,7 @@ export class CategoriesController {
     const cookies = request.cookies as Record<string, string | undefined>;
     const actor = await this.getCurrentUserUseCase.execute({
       token: cookies.session,
+    apiKey: request.get('x-api-key'),
     });
     const category = await this.updateCategoryUseCase.execute({
       actorId: actor.id,
@@ -154,6 +156,7 @@ export class CategoriesController {
     const cookies = request.cookies as Record<string, string | undefined>;
     const actor = await this.getCurrentUserUseCase.execute({
       token: cookies.session,
+    apiKey: request.get('x-api-key'),
     });
     const category = await this.setCategoryActiveUseCase.execute({
       actorId: actor.id,

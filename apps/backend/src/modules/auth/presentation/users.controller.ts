@@ -42,6 +42,7 @@ export class UsersController {
     const cookies = request.cookies as Record<string, string | undefined>;
     const actor = await this.getCurrentUserUseCase.execute({
       token: cookies.session,
+    apiKey: request.get('x-api-key'),
     });
 
     await this.resetPasswordUseCase.execute({

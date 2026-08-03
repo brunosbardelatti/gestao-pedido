@@ -39,6 +39,7 @@ export class AuthController {
     const cookies = request.cookies as Record<string, string | undefined>;
     const user = await this.getCurrentUserUseCase.execute({
       token: cookies.session,
+      apiKey: request.get('x-api-key'),
     });
 
     return { data: user };
