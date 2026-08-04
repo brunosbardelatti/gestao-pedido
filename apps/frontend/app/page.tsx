@@ -8,6 +8,7 @@ import {
   History,
   PackageSearch,
   Plus,
+  Settings,
   ShoppingBag,
   ShoppingCart,
   ReceiptText,
@@ -118,6 +119,25 @@ export default async function HomePage(): Promise<React.JSX.Element> {
               </Link>
             </div>
           </div>
+          {user.role === 'ADMIN' ? (
+            <div className="workspace-row">
+              <Settings aria-hidden />
+              <div>
+                <h2>Administração</h2>
+                <p>Gerenciamento de usuários do sistema.</p>
+              </div>
+              <div className="workspace-actions">
+                <Link href="/users" className="workspace-action">
+                  <Users className="size-4" aria-hidden />
+                  Consultar usuários
+                </Link>
+                <Link href="/users/new" className="workspace-action">
+                  <UserPlus className="size-4" aria-hidden />
+                  Cadastrar usuário
+                </Link>
+              </div>
+            </div>
+          ) : null}
           <div className="workspace-row">
             <ChartNoAxesCombined aria-hidden />
             <div>

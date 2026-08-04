@@ -10,8 +10,11 @@ import type { Response } from 'express';
 
 import { InvalidCredentialsError } from '../../modules/auth/domain/errors/invalid-credentials.error';
 import { AuthenticationRequiredError } from '../../modules/auth/domain/errors/authentication-required.error';
+import { CannotDeactivateOwnAccountError } from '../../modules/auth/domain/errors/cannot-deactivate-own-account.error';
 import { CannotResetOwnPasswordError } from '../../modules/auth/domain/errors/cannot-reset-own-password.error';
+import { CurrentPasswordIncorrectError } from '../../modules/auth/domain/errors/current-password-incorrect.error';
 import { InsufficientRoleError } from '../../modules/auth/domain/errors/insufficient-role.error';
+import { LoginAlreadyTakenError } from '../../modules/auth/domain/errors/login-already-taken.error';
 import { UserNotFoundError } from '../../modules/auth/domain/errors/user-not-found.error';
 import { BrandAlreadyExistsError } from '../../modules/brands/domain/errors/brand-already-exists.error';
 import { BrandNotFoundError } from '../../modules/brands/domain/errors/brand-not-found.error';
@@ -154,6 +157,30 @@ export class ApiExceptionFilter implements ExceptionFilter {
     }
 
     if (exception instanceof CannotResetOwnPasswordError) {
+      return {
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof CurrentPasswordIncorrectError) {
+      return {
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof LoginAlreadyTakenError) {
+      return {
+        status: HttpStatus.CONFLICT,
+        code: exception.code,
+        message: exception.message,
+      };
+    }
+
+    if (exception instanceof CannotDeactivateOwnAccountError) {
       return {
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         code: exception.code,
