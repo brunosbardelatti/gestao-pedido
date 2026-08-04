@@ -102,7 +102,7 @@ export function ResetPasswordSection({ userId, userName }: ResetPasswordSectionP
           </div>
         ) : null}
 
-        <Button type="submit" variant="outline" disabled={isSubmitting}>
+        <Button type="submit" variant="ghost" disabled={isSubmitting}>
           {isSubmitting ? (
             <>
               <LoaderCircle className="size-4 animate-spin" aria-hidden />
