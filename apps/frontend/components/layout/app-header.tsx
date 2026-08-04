@@ -18,12 +18,15 @@ export function AppHeader({ user }: AppHeaderProps): React.JSX.Element {
         <span>Gestão de Pedidos</span>
       </Link>
       <div className="ml-auto flex items-center gap-2 sm:gap-4">
-        <div className="hidden text-right min-[480px]:block">
+        <Link
+          href="/profile"
+          className="hidden text-right min-[480px]:block hover:opacity-75 transition-opacity"
+        >
           <p className="text-sm font-medium">{user.name}</p>
           <p className="text-xs text-muted-foreground">
             {user.role === 'ADMIN' ? 'Administrador' : 'Operador'}
           </p>
-        </div>
+        </Link>
         <LogoutButton />
       </div>
     </header>

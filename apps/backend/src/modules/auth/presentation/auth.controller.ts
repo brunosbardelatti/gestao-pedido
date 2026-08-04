@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   Inject,
+  Patch,
   Post,
   Req,
   Res,
@@ -12,9 +13,11 @@ import {
 import type { Response } from 'express';
 
 import type { RequestWithId } from '../../../common/http/request-with-id';
+import { ChangeOwnPasswordUseCase } from '../application/use-cases/change-own-password.use-case';
 import { LoginUseCase } from '../application/use-cases/login.use-case';
 import { GetCurrentUserUseCase } from '../application/use-cases/get-current-user.use-case';
 import { LogoutUseCase } from '../application/use-cases/logout.use-case';
+import { ChangeOwnPasswordDto } from './dto/change-own-password.dto';
 import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
@@ -24,6 +27,8 @@ export class AuthController {
     @Inject(GetCurrentUserUseCase)
     private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
     @Inject(LogoutUseCase) private readonly logoutUseCase: LogoutUseCase,
+    @Inject(ChangeOwnPasswordUseCase)
+    private readonly changeOwnPasswordUseCase: ChangeOwnPasswordUseCase,
   ) {}
 
   @Get('me')
@@ -88,6 +93,34 @@ export class AuthController {
     });
 
     return { data: result.user };
+  }
+
+  @Patch('password')
+  @HttpCode(204)
+  async changePassword(
+    @Body(
+      new ValidationPipe({
+        expectedType: ChangeOwnPasswordDto,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    )
+    input: ChangeOwnPasswordDto,
+    @Req() request: RequestWithId,
+  ): Promise<void> {
+    const cookies = request.cookies as Record<string, string | undefined>;
+    const actor = await this.getCurrentUserUseCase.execute({
+      token: cookies.session,
+      apiKey: request.get('x-api-key'),
+    });
+
+    await this.changeOwnPasswordUseCase.execute({
+      actorId: actor.id,
+      currentPassword: input.currentPassword,
+      newPassword: input.newPassword,
+      requestId: request.requestId,
+    });
   }
 
   @Post('logout')
