@@ -49,7 +49,11 @@ const saleSchema = z
           unitPrice: z
             .string()
             .trim()
-            .regex(moneyPattern, 'Informe um preço válido.'),
+            .regex(moneyPattern, 'Informe um preço válido.')
+            .refine(
+              (v) => parseFloat(v.replace(',', '.')) > 0,
+              'O preço deve ser maior que zero.',
+            ),
         }),
       )
       .min(1, 'Adicione ao menos um item.'),

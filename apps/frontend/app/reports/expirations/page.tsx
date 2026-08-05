@@ -40,7 +40,7 @@ function parseQuery(
     withinDays:
       Number.isInteger(rawWithinDays) && rawWithinDays > 0
         ? rawWithinDays
-        : undefined,
+        : 30,
     page: Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1,
     pageSize: 20,
   };

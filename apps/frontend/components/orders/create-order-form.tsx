@@ -60,7 +60,7 @@ const createOrderSchema = z
       .string()
       .trim()
       .min(1, 'Informe o ciclo.')
-      .max(80, 'O ciclo deve ter no máximo 80 caracteres.'),
+      .regex(/^\d{2}\/\d{4}$/, 'Use o formato MM/AAAA (ex: 08/2026).'),
     orderDate: z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, 'Informe a data do pedido.'),
@@ -327,8 +327,8 @@ export function OrderForm({
           <Label htmlFor="order-cycle">Ciclo</Label>
           <Input
             id="order-cycle"
-            maxLength={80}
-            placeholder="Ex.: 12/2026"
+            maxLength={7}
+            placeholder="MM/AAAA"
             aria-invalid={Boolean(errors.cycle)}
             {...register('cycle')}
           />

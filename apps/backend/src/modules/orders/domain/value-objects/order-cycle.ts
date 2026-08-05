@@ -5,7 +5,7 @@ export class OrderCycle {
 
   static create(input: string): OrderCycle {
     const value = input.normalize('NFKC').trim();
-    if (value.length === 0 || value.length > 80) {
+    if (!/^\d{2}\/\d{4}$/.test(value)) {
       throw new InvalidOrderCycleError();
     }
 

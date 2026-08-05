@@ -12,7 +12,8 @@ export default function LoginPage(): React.JSX.Element {
           alt=""
           fill
           priority
-          sizes="(max-width: 760px) 100vw, 68vw"
+          quality={70}
+          sizes="(max-width: 768px) 100vw, 68vw"
           className="object-cover object-left-center"
         />
         <div className="login-visual-caption">
