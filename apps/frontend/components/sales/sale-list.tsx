@@ -1,9 +1,9 @@
 import {
   Ban,
+  CheckCircle2,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  CircleCheck,
   ReceiptText,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -27,11 +27,11 @@ interface SaleListProps {
 
 const statusPresentation: Record<
   SaleStatus,
-  { label: string; icon: typeof CircleCheck; className: string }
+  { label: string; icon: typeof CheckCircle2; className: string }
 > = {
   COMPLETED: {
     label: 'Concluída',
-    icon: CircleCheck,
+    icon: CheckCircle2,
     className: 'text-emerald-700 dark:text-emerald-400',
   },
   CANCELED: {
@@ -183,15 +183,18 @@ export function SaleList({ sales, meta, query }: SaleListProps): React.JSX.Eleme
               <ChevronLeft className="size-4" aria-hidden />
             </Link>
           ) : (
-            <span
-              aria-hidden
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              aria-label="Página anterior"
               className={cn(
                 buttonVariants({ variant: 'ghost', size: 'icon' }),
-                'pointer-events-none opacity-40',
+                'opacity-40 cursor-not-allowed',
               )}
             >
-              <ChevronLeft className="size-4" />
-            </span>
+              <ChevronLeft className="size-4" aria-hidden />
+            </button>
           )}
           {meta.page < meta.totalPages ? (
             <Link
@@ -203,15 +206,18 @@ export function SaleList({ sales, meta, query }: SaleListProps): React.JSX.Eleme
               <ChevronRight className="size-4" aria-hidden />
             </Link>
           ) : (
-            <span
-              aria-hidden
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              aria-label="Próxima página"
               className={cn(
                 buttonVariants({ variant: 'ghost', size: 'icon' }),
-                'pointer-events-none opacity-40',
+                'opacity-40 cursor-not-allowed',
               )}
             >
-              <ChevronRight className="size-4" />
-            </span>
+              <ChevronRight className="size-4" aria-hidden />
+            </button>
           )}
         </div>
       </div>

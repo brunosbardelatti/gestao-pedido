@@ -73,7 +73,7 @@ export function CreateUserForm(): React.JSX.Element {
             {...register('name')}
           />
           {errors.name ? (
-            <p className="text-sm text-destructive">{errors.name.message}</p>
+            <p role="alert" className="text-sm text-destructive">{errors.name.message}</p>
           ) : null}
         </div>
 
@@ -86,7 +86,7 @@ export function CreateUserForm(): React.JSX.Element {
             {...register('login')}
           />
           {errors.login ? (
-            <p className="text-sm text-destructive">{errors.login.message}</p>
+            <p role="alert" className="text-sm text-destructive">{errors.login.message}</p>
           ) : null}
         </div>
 
@@ -100,7 +100,7 @@ export function CreateUserForm(): React.JSX.Element {
             {...register('password')}
           />
           {errors.password ? (
-            <p className="text-sm text-destructive">{errors.password.message}</p>
+            <p role="alert" className="text-sm text-destructive">{errors.password.message}</p>
           ) : null}
         </div>
 
@@ -115,7 +115,7 @@ export function CreateUserForm(): React.JSX.Element {
             <option value="ADMIN">Administrador</option>
           </select>
           {errors.role ? (
-            <p className="text-sm text-destructive">{errors.role.message}</p>
+            <p role="alert" className="text-sm text-destructive">{errors.role.message}</p>
           ) : null}
         </div>
       </div>

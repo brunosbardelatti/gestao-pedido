@@ -16,3 +16,5 @@ output/
 *.tsbuildinfo
 .DS_Store
 .claude/
+.playwright-mcp/
+/[0-9][0-9]-*.png

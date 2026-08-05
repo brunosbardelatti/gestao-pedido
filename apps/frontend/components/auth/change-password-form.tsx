@@ -78,7 +78,7 @@ export function ChangePasswordForm(): React.JSX.Element {
           {...register('currentPassword')}
         />
         {errors.currentPassword ? (
-          <p className="text-sm text-destructive">{errors.currentPassword.message}</p>
+          <p role="alert" className="text-sm text-destructive">{errors.currentPassword.message}</p>
         ) : null}
       </div>
 
@@ -92,7 +92,7 @@ export function ChangePasswordForm(): React.JSX.Element {
           {...register('newPassword')}
         />
         {errors.newPassword ? (
-          <p className="text-sm text-destructive">{errors.newPassword.message}</p>
+          <p role="alert" className="text-sm text-destructive">{errors.newPassword.message}</p>
         ) : null}
       </div>
 
@@ -106,7 +106,7 @@ export function ChangePasswordForm(): React.JSX.Element {
           {...register('confirmPassword')}
         />
         {errors.confirmPassword ? (
-          <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+          <p role="alert" className="text-sm text-destructive">{errors.confirmPassword.message}</p>
         ) : null}
       </div>
 
@@ -123,7 +123,7 @@ export function ChangePasswordForm(): React.JSX.Element {
       {success ? (
         <div
           role="status"
-          className="flex items-center gap-2 border-l-2 border-green-600 bg-green-50 px-3 py-2.5 text-sm text-green-700 dark:bg-green-950 dark:text-green-400"
+          className="flex items-center gap-2 border-l-2 border-ring bg-ring/10 px-3 py-2.5 text-sm text-foreground"
         >
           <CheckCircle2 className="size-4 shrink-0" aria-hidden />
           <span>Senha alterada com sucesso.</span>

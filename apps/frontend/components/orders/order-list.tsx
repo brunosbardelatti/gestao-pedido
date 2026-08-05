@@ -183,15 +183,18 @@ export function OrderList({
               <ChevronLeft className="size-4" aria-hidden />
             </Link>
           ) : (
-            <span
-              aria-hidden
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              aria-label="Página anterior"
               className={cn(
                 buttonVariants({ variant: 'ghost', size: 'icon' }),
-                'pointer-events-none opacity-40',
+                'opacity-40 cursor-not-allowed',
               )}
             >
-              <ChevronLeft className="size-4" />
-            </span>
+              <ChevronLeft className="size-4" aria-hidden />
+            </button>
           )}
           {meta.page < meta.totalPages ? (
             <Link
@@ -203,15 +206,18 @@ export function OrderList({
               <ChevronRight className="size-4" aria-hidden />
             </Link>
           ) : (
-            <span
-              aria-hidden
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              aria-label="Próxima página"
               className={cn(
                 buttonVariants({ variant: 'ghost', size: 'icon' }),
-                'pointer-events-none opacity-40',
+                'opacity-40 cursor-not-allowed',
               )}
             >
-              <ChevronRight className="size-4" />
-            </span>
+              <ChevronRight className="size-4" aria-hidden />
+            </button>
           )}
         </div>
       </div>

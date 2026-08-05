@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, CircleCheck, LoaderCircle, Pencil, Plus } from 'lucide-react';
+import { AlertCircle, CheckCircle2, LoaderCircle, Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -102,7 +102,7 @@ export function CreateBrandForm(): React.JSX.Element {
           {...register('name')}
         />
         {errors.name ? (
-          <p id="brand-name-error" className="text-sm text-destructive">
+          <p role="alert" id="brand-name-error" className="text-sm text-destructive">
             {errors.name.message}
           </p>
         ) : null}
@@ -123,7 +123,7 @@ export function CreateBrandForm(): React.JSX.Element {
           role="status"
           className="mt-5 flex items-start gap-2 border-l-2 border-ring bg-muted px-3 py-2.5 text-sm text-foreground"
         >
-          <CircleCheck className="mt-0.5 size-4 shrink-0 text-ring" aria-hidden />
+          <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-ring" aria-hidden />
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2">
             <span>Marca {createdBrand.name} cadastrada.</span>
             <Link

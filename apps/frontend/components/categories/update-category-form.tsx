@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, CircleCheck, LoaderCircle, Save } from 'lucide-react';
+import { AlertCircle, CheckCircle2, LoaderCircle, Save } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -109,7 +109,7 @@ export function UpdateCategoryForm({
           {...register('name')}
         />
         {errors.name ? (
-          <p id="category-name-error" className="text-sm text-destructive">
+          <p role="alert" id="category-name-error" className="text-sm text-destructive">
             {errors.name.message}
           </p>
         ) : null}
@@ -130,7 +130,7 @@ export function UpdateCategoryForm({
           role="status"
           className="mt-5 flex items-start gap-2 border-l-2 border-ring bg-muted px-3 py-2.5 text-sm text-foreground"
         >
-          <CircleCheck className="mt-0.5 size-4 shrink-0 text-ring" aria-hidden />
+          <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-ring" aria-hidden />
           <span>{successMessage}</span>
         </div>
       ) : null}

@@ -28,7 +28,7 @@ export default async function EditUserPage({
   const isSelf = currentUser.id === targetUser.id;
 
   return (
-    <main className="min-h-svh bg-background text-foreground">
+    <main className="min-h-screen min-h-svh bg-background text-foreground">
       <AppHeader user={currentUser} />
       <section className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-10">
         <Link

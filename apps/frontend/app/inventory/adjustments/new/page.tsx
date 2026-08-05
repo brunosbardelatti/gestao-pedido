@@ -14,7 +14,7 @@ export default async function NewInventoryAdjustmentPage(): Promise<React.JSX.El
   const products = await getInventoryAdjustmentProducts();
 
   return (
-    <main className="min-h-svh bg-background text-foreground">
+    <main className="min-h-screen min-h-svh bg-background text-foreground">
       <AppHeader user={user} />
       <section className="mx-auto max-w-3xl px-5 py-8 sm:px-8 sm:py-10">
         <Link

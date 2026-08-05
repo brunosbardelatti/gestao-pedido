@@ -1,4 +1,4 @@
-import { CalendarDays, CircleCheck, RotateCcw } from 'lucide-react';
+import { CalendarDays, CheckCircle2, RotateCcw } from 'lucide-react';
 
 import type { SalesReport } from '@/lib/reports';
 
@@ -22,7 +22,7 @@ export function SalesReportSummary({
   report,
   includeCanceled,
 }: SalesReportSummaryProps): React.JSX.Element {
-  const ScopeIcon = includeCanceled ? RotateCcw : CircleCheck;
+  const ScopeIcon = includeCanceled ? RotateCcw : CheckCircle2;
 
   return (
     <section aria-labelledby="sales-report-period">

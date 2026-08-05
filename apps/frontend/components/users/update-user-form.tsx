@@ -83,7 +83,7 @@ export function UpdateUserForm({ user, isSelf }: UpdateUserFormProps): React.JSX
             {...register('name')}
           />
           {errors.name ? (
-            <p className="text-sm text-destructive">{errors.name.message}</p>
+            <p role="alert" className="text-sm text-destructive">{errors.name.message}</p>
           ) : null}
         </div>
 
@@ -125,7 +125,7 @@ export function UpdateUserForm({ user, isSelf }: UpdateUserFormProps): React.JSX
       {success ? (
         <div
           role="status"
-          className="flex items-center gap-2 border-l-2 border-green-600 bg-green-50 px-3 py-2.5 text-sm text-green-700 dark:bg-green-950 dark:text-green-400"
+          className="flex items-center gap-2 border-l-2 border-ring bg-ring/10 px-3 py-2.5 text-sm text-foreground"
         >
           <CheckCircle2 className="size-4 shrink-0" aria-hidden />
           <span>Usuário atualizado com sucesso.</span>

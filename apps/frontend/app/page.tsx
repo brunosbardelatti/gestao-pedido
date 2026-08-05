@@ -31,7 +31,7 @@ export default async function HomePage(): Promise<React.JSX.Element> {
   }
 
   return (
-    <main className="min-h-svh bg-background text-foreground">
+    <main className="min-h-screen min-h-svh bg-background text-foreground">
       <AppHeader user={user} />
       <section className="mx-auto max-w-6xl px-5 py-10 sm:px-8">
         <p className="section-kicker">Visão geral</p>

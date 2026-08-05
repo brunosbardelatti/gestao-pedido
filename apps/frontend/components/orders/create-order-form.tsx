@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   AlertCircle,
-  CircleCheck,
+  CheckCircle2,
   ClipboardPlus,
   LoaderCircle,
   Plus,
@@ -320,7 +320,7 @@ export function OrderForm({
             ))}
           </NativeSelect>
           {errors.brandId ? (
-            <p className="text-sm text-destructive">{errors.brandId.message}</p>
+            <p role="alert" className="text-sm text-destructive">{errors.brandId.message}</p>
           ) : null}
         </div>
         <div className="space-y-2">
@@ -333,7 +333,7 @@ export function OrderForm({
             {...register('cycle')}
           />
           {errors.cycle ? (
-            <p className="text-sm text-destructive">{errors.cycle.message}</p>
+            <p role="alert" className="text-sm text-destructive">{errors.cycle.message}</p>
           ) : null}
         </div>
         <div className="space-y-2">
@@ -345,7 +345,7 @@ export function OrderForm({
             {...register('orderDate')}
           />
           {errors.orderDate ? (
-            <p className="text-sm text-destructive">
+            <p role="alert" className="text-sm text-destructive">
               {errors.orderDate.message}
             </p>
           ) : null}
@@ -414,7 +414,7 @@ export function OrderForm({
                       ))}
                     </NativeSelect>
                     {itemError?.productId ? (
-                      <p className="text-sm text-destructive">
+                      <p role="alert" className="text-sm text-destructive">
                         {itemError.productId.message}
                       </p>
                     ) : null}
@@ -435,7 +435,7 @@ export function OrderForm({
                       })}
                     />
                     {itemError?.quantityOrdered ? (
-                      <p className="text-sm text-destructive">
+                      <p role="alert" className="text-sm text-destructive">
                         {itemError.quantityOrdered.message}
                       </p>
                     ) : null}
@@ -467,7 +467,7 @@ export function OrderForm({
                           {...register(`items.${index}.${name}`)}
                         />
                         {error ? (
-                          <p className="text-sm text-destructive">
+                          <p role="alert" className="text-sm text-destructive">
                             {error.message}
                           </p>
                         ) : null}
@@ -505,7 +505,7 @@ export function OrderForm({
           role="status"
           className="mt-5 flex items-start gap-2 border-l-2 border-ring bg-muted px-3 py-2.5 text-sm text-foreground"
         >
-          <CircleCheck className="mt-0.5 size-4 shrink-0 text-ring" aria-hidden />
+          <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-ring" aria-hidden />
           <span>
             Pedido do ciclo {success.cycle}{' '}
             {isUpdate ? 'atualizado.' : 'criado.'}

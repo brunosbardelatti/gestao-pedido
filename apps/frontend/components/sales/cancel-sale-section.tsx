@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import {
   AlertCircle,
   Ban,
-  CircleCheck,
+  CheckCircle2,
   LoaderCircle,
   TriangleAlert,
 } from 'lucide-react';
@@ -78,7 +78,7 @@ export function CancelSaleSection({
           role="status"
           className="flex items-start gap-2 border-l-2 border-ring bg-muted px-3 py-2.5 text-sm"
         >
-          <CircleCheck className="mt-0.5 size-4 shrink-0 text-ring" aria-hidden />
+          <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-ring" aria-hidden />
           <span>
             Venda de {currency.format(Number(total))} cancelada. O estoque foi
             recomposto.

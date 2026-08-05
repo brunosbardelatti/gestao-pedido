@@ -1,7 +1,7 @@
 import {
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  CircleCheck,
   CircleMinus,
   Pencil,
   UserSearch,
@@ -84,7 +84,7 @@ export function CustomerList({
                 </p>
                 <span className="inline-flex items-center gap-1.5">
                   {customer.active ? (
-                    <CircleCheck className="size-4 text-ring" aria-hidden />
+                    <CheckCircle2 className="size-4 text-ring" aria-hidden />
                   ) : (
                     <CircleMinus className="size-4 text-muted-foreground" aria-hidden />
                   )}
@@ -124,7 +124,7 @@ export function CustomerList({
               <ChevronLeft className="size-4" aria-hidden />
             </Link>
           ) : (
-            <DisabledPageIcon><ChevronLeft className="size-4" /></DisabledPageIcon>
+            <DisabledPageIcon aria-label="Página anterior"><ChevronLeft className="size-4" aria-hidden /></DisabledPageIcon>
           )}
           {meta.page < meta.totalPages ? (
             <Link
@@ -136,7 +136,7 @@ export function CustomerList({
               <ChevronRight className="size-4" aria-hidden />
             </Link>
           ) : (
-            <DisabledPageIcon><ChevronRight className="size-4" /></DisabledPageIcon>
+            <DisabledPageIcon aria-label="Próxima página"><ChevronRight className="size-4" aria-hidden /></DisabledPageIcon>
           )}
         </div>
       </div>
@@ -155,16 +155,19 @@ function Data({ label, value }: { label: string; value: string }): React.JSX.Ele
   );
 }
 
-function DisabledPageIcon({ children }: { children: React.ReactNode }): React.JSX.Element {
+function DisabledPageIcon({ children, 'aria-label': ariaLabel }: { children: React.ReactNode; 'aria-label': string }): React.JSX.Element {
   return (
-    <span
-      aria-hidden
+    <button
+      type="button"
+      disabled
+      aria-disabled="true"
+      aria-label={ariaLabel}
       className={cn(
         buttonVariants({ variant: 'ghost', size: 'icon' }),
-        'pointer-events-none opacity-40',
+        'opacity-40 cursor-not-allowed',
       )}
     >
       {children}
-    </span>
+    </button>
   );
 }

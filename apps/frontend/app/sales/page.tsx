@@ -65,7 +65,7 @@ export default async function SalesPage({
   };
 
   return (
-    <main className="min-h-svh bg-background text-foreground">
+    <main className="min-h-screen min-h-svh bg-background text-foreground">
       <AppHeader user={user} />
       <section className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-10">
         <Link
@@ -115,10 +115,12 @@ export default async function SalesPage({
           <div className="space-y-2">
             <Label htmlFor="sale-start-date-filter">Data inicial</Label>
             <Input id="sale-start-date-filter" name="startDate" type="date" defaultValue={query.startDate} />
+            <p className="text-xs text-muted-foreground mt-1">DD/MM/AAAA</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="sale-end-date-filter">Data final</Label>
             <Input id="sale-end-date-filter" name="endDate" type="date" defaultValue={query.endDate} />
+            <p className="text-xs text-muted-foreground mt-1">DD/MM/AAAA</p>
           </div>
           <div className="flex gap-2 sm:col-span-2 lg:col-span-1">
             <Button type="submit">

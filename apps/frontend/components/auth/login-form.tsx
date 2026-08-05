@@ -78,7 +78,7 @@ export function LoginForm(): React.JSX.Element {
           {...register('login')}
         />
         {errors.login ? (
-          <p id="login-error" className="text-sm text-destructive">
+          <p role="alert" id="login-error" className="text-sm text-destructive">
             {errors.login.message}
           </p>
         ) : null}
@@ -109,7 +109,7 @@ export function LoginForm(): React.JSX.Element {
           </Button>
         </div>
         {errors.password ? (
-          <p id="password-error" className="text-sm text-destructive">
+          <p role="alert" id="password-error" className="text-sm text-destructive">
             {errors.password.message}
           </p>
         ) : null}

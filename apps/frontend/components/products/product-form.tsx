@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   AlertCircle,
-  CircleCheck,
+  CheckCircle2,
   LoaderCircle,
   Plus,
   Save,
@@ -249,7 +249,7 @@ export function ProductForm({
             </p>
           ) : null}
           {errors.brandId ? (
-            <p id="product-brand-error" className="text-sm text-destructive">
+            <p role="alert" id="product-brand-error" className="text-sm text-destructive">
               {errors.brandId.message}
             </p>
           ) : null}
@@ -285,7 +285,7 @@ export function ProductForm({
             </p>
           ) : null}
           {errors.categoryId ? (
-            <p id="product-category-error" className="text-sm text-destructive">
+            <p role="alert" id="product-category-error" className="text-sm text-destructive">
               {errors.categoryId.message}
             </p>
           ) : null}
@@ -302,7 +302,7 @@ export function ProductForm({
             {...register('code')}
           />
           {errors.code ? (
-            <p id="product-code-error" className="text-sm text-destructive">
+            <p role="alert" id="product-code-error" className="text-sm text-destructive">
               {errors.code.message}
             </p>
           ) : null}
@@ -320,7 +320,7 @@ export function ProductForm({
             {...register('description')}
           />
           {errors.description ? (
-            <p id="product-description-error" className="text-sm text-destructive">
+            <p role="alert" id="product-description-error" className="text-sm text-destructive">
               {errors.description.message}
             </p>
           ) : null}
@@ -359,6 +359,7 @@ export function ProductForm({
                 />
                 {error ? (
                   <p
+                    role="alert"
                     id={`product-${name}-error`}
                     className="text-sm text-destructive"
                   >
@@ -386,7 +387,7 @@ export function ProductForm({
           role="status"
           className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 border-l-2 border-ring bg-muted px-3 py-2.5 text-sm text-foreground"
         >
-          <CircleCheck className="size-4 shrink-0 text-ring" aria-hidden />
+          <CheckCircle2 className="size-4 shrink-0 text-ring" aria-hidden />
           <span>
             Produto {success.code} {isUpdate ? 'atualizado' : 'cadastrado'}.
           </span>

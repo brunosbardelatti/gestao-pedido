@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   AlertTriangle,
-  CircleCheck,
+  CheckCircle2,
   LoaderCircle,
   Plus,
   ShoppingCart,
@@ -295,7 +295,7 @@ export function CreateSaleForm({
                       ))}
                     </NativeSelect>
                     {itemError?.productId ? (
-                      <p className="text-sm text-destructive">{itemError.productId.message}</p>
+                      <p role="alert" className="text-sm text-destructive">{itemError.productId.message}</p>
                     ) : null}
                     {selected ? (
                       <p className="text-xs text-muted-foreground">
@@ -314,7 +314,7 @@ export function CreateSaleForm({
                       {...register(`items.${index}.quantity`, { valueAsNumber: true })}
                     />
                     {itemError?.quantity ? (
-                      <p className="text-sm text-destructive">{itemError.quantity.message}</p>
+                      <p role="alert" className="text-sm text-destructive">{itemError.quantity.message}</p>
                     ) : null}
                   </div>
                   <div className="space-y-2">
@@ -326,7 +326,7 @@ export function CreateSaleForm({
                       {...register(`items.${index}.unitPrice`)}
                     />
                     {itemError?.unitPrice ? (
-                      <p className="text-sm text-destructive">{itemError.unitPrice.message}</p>
+                      <p role="alert" className="text-sm text-destructive">{itemError.unitPrice.message}</p>
                     ) : null}
                   </div>
                 </div>
@@ -363,7 +363,7 @@ export function CreateSaleForm({
       ) : null}
       {success ? (
         <div role="status" className="mt-5 flex items-center gap-2 border-l-2 border-ring bg-muted px-3 py-2.5 text-sm">
-          <CircleCheck className="size-4 text-ring" aria-hidden />
+          <CheckCircle2 className="size-4 text-ring" aria-hidden />
           Venda registrada no total de {currency.format(Number(success.total))}.
         </div>
       ) : null}

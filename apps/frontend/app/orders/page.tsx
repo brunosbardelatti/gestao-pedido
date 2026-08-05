@@ -69,7 +69,7 @@ export default async function OrdersPage({
   };
 
   return (
-    <main className="min-h-svh bg-background text-foreground">
+    <main className="min-h-screen min-h-svh bg-background text-foreground">
       <AppHeader user={user} />
       <section className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-10">
         <Link
@@ -92,7 +92,7 @@ export default async function OrdersPage({
         </div>
 
         <form
-          className="mt-7 grid gap-4 border-y border-border py-5 sm:grid-cols-2 lg:grid-cols-[0.9fr_1fr_1fr_0.9fr_0.9fr_auto] lg:items-end"
+          className="mt-7 grid gap-4 border-y border-border py-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[0.9fr_1fr_1fr_0.9fr_0.9fr_auto] lg:items-end"
           method="get"
         >
           <div className="space-y-2">
@@ -141,6 +141,7 @@ export default async function OrdersPage({
               type="date"
               defaultValue={query.startDate}
             />
+            <p className="text-xs text-muted-foreground mt-1">DD/MM/AAAA</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="order-end-date-filter">Data final</Label>
@@ -150,6 +151,7 @@ export default async function OrdersPage({
               type="date"
               defaultValue={query.endDate}
             />
+            <p className="text-xs text-muted-foreground mt-1">DD/MM/AAAA</p>
           </div>
           <div className="flex gap-2 sm:col-span-2 lg:col-span-1">
             <Button type="submit">

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   AlertCircle,
-  CircleCheck,
+  CheckCircle2,
   LoaderCircle,
   Save,
   TriangleAlert,
@@ -264,7 +264,7 @@ export function AdjustStockForm({
       ) : null}
       {success ? (
         <div role="status" className="flex items-start gap-2 text-sm text-ring">
-          <CircleCheck className="mt-0.5 size-4 shrink-0" aria-hidden />
+          <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden />
           <span>{success}</span>
         </div>
       ) : null}
